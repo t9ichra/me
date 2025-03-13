@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = 800;
+canvas.height = 600;
+
+// Create night sky gradient
+const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+gradient.addColorStop(0, '#000033');
+gradient.addColorStop(1, '#000066');
+ctx.fillStyle = gradient;
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+// Add stars with twinkling animation
+class Star {
+    constructor(x, y, size) {
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.baseSize = size;
+        this.twinkleSpeed = Math.random() * 0.1 + 0.05;
+        this.angle = Math.random() * Math.PI * 2;
+    }
+    
+    draw(time) {
+        const twinkle = Math.sin(this.angle + time * this.twinkleSpeed);
+        const currentSize = this.baseSize * (1 + twinkle * 0.5);
+        
+        // Star glow
+        const gradient = ctx.createRadialGradient(
+            this.x, this.y, 0,
+            this.x, this.y, currentSize * 2
+        );
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+        gradient.addColorStop(0.1, 'rgba(255, 255, 255, 0.3)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, currentSize * 2, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+        
+        // Star core
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, currentSize, 0, Math.PI * 2);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+    }
+}
+
+// Create stars
+const stars = [];
+for (let i = 0; i < 200; i++) {
+    stars.push(new Star(
+        Math.random() * canvas.width,
+        Math.random() * canvas.height,
+        Math.random() * 2 + 1
+    ));
+}
+
+// Create shooting stars
+class ShootingStar {
+    constructor() {
+        this.reset();
+    }
+    
+    reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = 0;
+        this.length = Math.random() * 80 + 40;
+        this.speed = Math.random() * 15 + 10;
+        this.angle = Math.PI / 4 + Math.random() * Math.PI / 8;
+        this.alive = true;
+    }
+    
+    draw() {
+        if (!this.alive) return;
+        
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        const tailX = this.x - Math.cos(this.angle) * this.length;
+        const tailY = this.y - Math.sin(this.angle) * this.length;
+        
+        const gradient = ctx.createLinearGradient(
+            this.x, this.y,
+            tailX, tailY
+        );
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        
+        ctx.lineTo(tailX, tailY);
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed;
+        
+        if (this.y > canvas.height || this.x < 0) {
+            this.reset();
+        }
+    }
+}
+
+const shootingStars = Array(3).fill(null).map(() => new ShootingStar());
+
+// Animation loop
+function animate() {
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    const time = Date.now() / 1000;
+    
+    // Draw regular stars
+    stars.forEach(star => star.draw(time));
+    
+    // Draw shooting stars
+    shootingStars.forEach(star => star.draw());
+    
+    requestAnimationFrame(animate);
+}
+
+animate();
+
+// Optional: Add to document
+document.body.appendChild(canvas);
+    </script>
+    </body>
+    </html>

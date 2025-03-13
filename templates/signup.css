@@ -1,0 +1,331 @@
+@import url('https://fonts.googleapis.com/css2?family=Nosifer&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+       
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 50% 50%, transparent 0%, rgba(0,0,0,0.9) 100%),
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h100v100H0z' fill='%23200000'/%3E%3Cpath d='M10 10h80v80H10z' fill='%23300000'/%3E%3Cpath d='M20 20h60v60H20z' fill='%23400000'/%3E%3C/svg%3E");
+            animation: backgroundShift 30s linear infinite;
+            z-index: -2;
+        }
+
+      
+        @keyframes backgroundShift {
+            0% { background-position: 0 0; }
+            100% { background-position: 100% 100%; }
+        }
+
+         .container {
+            position: relative;
+            width: 400px;
+            padding: 2rem;
+            background: rgba(10, 10, 10, 0.95);
+            border: 2px solid #800000;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            transform-style: preserve-3d;
+            transition: transform 1s ease-in-out;
+        }
+
+        .container.flip {
+            transform: rotateY(180deg);
+        }
+
+        .form-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(20, 0, 0, 0.7);
+            border: 1px solid #800000;
+            color: #fff;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 25%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            font-size: 14px;  /* Smaller eye icon */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            z-index: 2;
+        }
+
+    
+
+        input:focus {
+            outline: none;
+            border-color: #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        button[type="submit"] {
+            width: 60%;
+            margin: 0 auto;
+            display: block;
+            padding: 0.8rem;
+        }
+
+        .otp-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 10, 10, 0.98);
+            border: 2px solid #800000;
+            padding: 2rem;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+            width: 300px;
+        }
+
+        .otp-modal.active {
+            display: block;
+            animation: modalAppear 0.3s ease-out;
+        }
+
+        .modal-close {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: none;
+            border: none;
+            color: #800000;
+            cursor: pointer;
+            font-size: 14px;  
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .modal-close:hover {
+            color: #ff0000;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: #800000;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        button:hover {
+            background: #600000;
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        .ghost {
+            position: fixed;
+            pointer-events: none;
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.1);
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg) scale(1);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(100px, -100px) rotate(180deg) scale(1.5);
+                opacity: 0.3;
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .switch-form {
+            text-align: center;
+            margin-top: 1rem;
+            color: #ffffff;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .switch-form:hover {
+            color: #ff0000;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+        }
+
+        .form-title {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            font-family: 'Courier New', monospace;
+            text-shadow: 2px 2px 4px rgba(255, 0, 0, 0.5);
+            animation: creepyTitle 3s infinite;
+        }
+
+       @keyframes creepyTitle {
+            0%, 100% { 
+                transform: translate(0) skew(0deg);
+                text-shadow: 2px 2px 4px #ff0000, -2px -2px 4px #800000;
+                filter: blur(0px);
+            }
+            25% { 
+                transform: translate(-2px, 2px) skew(2deg);
+                text-shadow: -3px 2px 4px #ff0000, 3px -2px 4px #800000;
+                filter: blur(1px);
+            }
+            50% {
+                transform: translate(0) skew(-3deg);
+                text-shadow: 4px 4px 8px #ff0000, -4px -4px 8px #800000;
+                filter: blur(2px);
+            }
+            75% { 
+                transform: translate(2px, -2px) skew(-2deg);
+                text-shadow: 2px -3px 4px #ff0000, -2px 3px 4px #800000;
+                filter: blur(1px);
+            }
+        }
+
+        .pentagram {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            opacity: 0.1;
+            animation: rotate 20s infinite linear;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+   
+        .blood-drip {
+            position: absolute;
+            top: 0;
+            width: 8px;
+            height: 40px;
+            background: linear-gradient(to bottom, 
+                #800000 0%,
+                #ff0000 40%,
+                rgba(128, 0, 0, 0.8) 80%,
+                transparent 100%);
+            filter: blur(1px);
+            border-radius: 50%;
+            animation: drip 3s infinite;
+            opacity: 0;
+
+        }
+
+        .blood-drip::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 16px;
+            background: #800000;
+            border-radius: 50%;
+            filter: blur(2px);
+        }
+
+         @keyframes drip {
+            0% {
+                height: 0;
+                top: 0;
+                opacity: 1;
+            }
+            70% {
+                opacity: 1;
+            }
+            100% {
+                height: 200px;
+                top: 100%;
+                opacity: 0;
+            }
+        }
+
+        ::selection {
+            background-color: #660000;
+            color: #ffffff;
+            text-shadow: 0 0 8px #ff0000;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 999;
+        }
+
+        .modal-overlay.active {
+            display: block;
+        }
+        input[type="password"], 
+        input[type="text"] {
+            padding-right: 35px; 
+        }

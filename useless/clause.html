@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>3D Raycaster</title>
+    <style>
+        body { 
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas { 
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Make canvas fullscreen and handle resize
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Simple map layout
+        const map = [
+            [1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,0,1],
+            [1,0,1,0,1,0,0,1],
+            [1,0,0,0,0,1,0,1],
+            [1,0,1,0,0,0,0,1],
+            [1,0,0,0,1,0,0,1],
+            [1,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1]
+        ];
+
+        // Player settings
+        let playerPos = { x: 1.5, y: 1.5 };
+        let playerAngle = 1;
+        const moveSpeed = 0.05;
+
+        // View settings
+        const FOV = Math.PI / 3;
+        const RAYS = canvas.width;
+        const MAX_DEPTH = 20;
+
+        // Load wall texture
+        const wallTexture = new Image();
+        wallTexture.src = '/api/placeholder/256/256';  // Replace with your texture
+
+        // Mouse look
+        let mouseX = canvas.width / 2;
+        canvas.addEventListener('mousemove', (e) => {
+            const sensitivity = 0.002;
+            const deltaX = e.clientX - mouseX;
+            playerAngle += deltaX * sensitivity;
+            mouseX = e.clientX;
+        });
+
+        // Basic movement
+        const keys = {};
+        document.addEventListener('keydown', (e) => keys[e.key] = true);
+        document.addEventListener('keyup', (e) => keys[e.key] = false);
+
+        function movePlayer() {
+            if (keys['w'] || keys['ArrowUp']) {
+                const newX = playerPos.x + Math.cos(playerAngle) * moveSpeed;
+                const newY = playerPos.y + Math.sin(playerAngle) * moveSpeed;
+                if (map[Math.floor(newY)][Math.floor(newX)] === 0) {
+                    playerPos.x = newX;
+                    playerPos.y = newY;
+                }
+            }
+            if (keys['s'] || keys['ArrowDown']) {
+                const newX = playerPos.x - Math.cos(playerAngle) * moveSpeed;
+                const newY = playerPos.y - Math.sin(playerAngle) * moveSpeed;
+                if (map[Math.floor(newY)][Math.floor(newX)] === 0) {
+                    playerPos.x = newX;
+                    playerPos.y = newY;
+                }
+            }
+        }
+
+        function castRay(angle) {
+            const rayDir = {
+                x: Math.cos(angle),
+                y: Math.sin(angle)
+            };
+
+            let mapPos = {
+                x: Math.floor(playerPos.x),
+                y: Math.floor(playerPos.y)
+            };
+
+            const deltaDistX = Math.abs(1 / rayDir.x);
+            const deltaDistY = Math.abs(1 / rayDir.y);
+
+            const stepX = rayDir.x >= 0 ? 1 : -1;
+            const stepY = rayDir.y >= 0 ? 1 : -1;
+
+            let sideDistX = rayDir.x >= 0 
+                ? (Math.floor(playerPos.x + 1) - playerPos.x) * deltaDistX
+                : (playerPos.x - Math.floor(playerPos.x)) * deltaDistX;
+            let sideDistY = rayDir.y >= 0
+                ? (Math.floor(playerPos.y + 1) - playerPos.y) * deltaDistY
+                : (playerPos.y - Math.floor(playerPos.y)) * deltaDistY;
+
+            let hit = false;
+            let side = 0;
+            let distance = 0;
+
+            while (!hit && distance < MAX_DEPTH) {
+                if (sideDistX < sideDistY) {
+                    sideDistX += deltaDistX;
+                    mapPos.x += stepX;
+                    side = 0;
+                    distance = sideDistX - deltaDistX;
+                } else {
+                    sideDistY += deltaDistY;
+                    mapPos.y += stepY;
+                    side = 1;
+                    distance = sideDistY - deltaDistY;
+                }
+
+                if (map[mapPos.y]?.[mapPos.x] === 1) hit = true;
+            }
+
+            let wallX;
+            if (side === 0) {
+                wallX = playerPos.y + distance * rayDir.y;
+            } else {
+                wallX = playerPos.x + distance * rayDir.x;
+            }
+            wallX -= Math.floor(wallX);
+
+            return { distance, side, wallX };
+        }
+
+        function render() {
+            // Clear screen with sky and ground
+            ctx.fillStyle = '#87CEEB';  // Sky
+            ctx.fillRect(0, 0, canvas.width, canvas.height/2);
+            ctx.fillStyle = '#228B22';  // Ground
+            ctx.fillRect(0, canvas.height/2, canvas.width, canvas.height/2);
+
+            movePlayer();
+
+            // Cast rays and render walls
+            for (let x = 0; x < RAYS; x++) {
+                const rayAngle = playerAngle - FOV/2 + (x/RAYS) * FOV;
+                const { distance, side, wallX } = castRay(rayAngle);
+                
+                // Fix fisheye effect
+                const perpDistance = distance * Math.cos(rayAngle - playerAngle);
+                const wallHeight = (canvas.height / perpDistance) * 0.75;
+                
+                // Add simple shading for depth
+                const brightness = side === 1 ? 0.7 : 1;
+                
+                if (wallTexture.complete) {
+                    const textureX = Math.floor(wallX * wallTexture.width);
+                    ctx.drawImage(
+                        wallTexture,
+                        textureX, 0,
+                        1, wallTexture.height,
+                        x, (canvas.height - wallHeight) / 2,
+                        1, wallHeight
+                    );
+                } else {
+                    // Fallback colored walls
+                    const color = Math.floor(200 * brightness);
+                    ctx.fillStyle = `rgb(${color},${color},${color})`;
+                    ctx.fillRect(x, (canvas.height - wallHeight) / 2, 1, wallHeight);
+                }
+            }
+
+            requestAnimationFrame(render);
+        }
+
+        // Start the game
+        render();
+
+        // Lock pointer for better control
+        canvas.addEventListener('click', () => {
+            canvas.requestPointerLock();
+        });
+    </script>
+</body>
+</html>

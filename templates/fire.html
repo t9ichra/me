@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .fire {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to top, #7c1829, transparent);
+            animation: flicker 1.5s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+    </style>
+    <title>Document</title>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div class="fire"></div>
+  
+        <script>
+            const particlesContainer = document.getElementById('particles-js');
+    
+            const createParticle = () => {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+    
+                const size = Math.random() * 5 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+    
+                particle.style.position = 'absolute';
+                particle.style.background = 'red';
+                particle.style.borderRadius = '50%';
+    
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.top = `${Math.random() * 100}vh`;
+                particle.style.opacity = Math.random();
+    
+                const animationDuration = Math.random() * 5 + 2;
+                particle.style.animation = `moveParticle ${animationDuration}s linear infinite`;
+    
+                particlesContainer.appendChild(particle);
+    
+                setTimeout(() => {
+                    particle.remove();
+                }, animationDuration * 1000);
+            };
+    
+            setInterval(createParticle, 100);
+    
+            document.head.insertAdjacentHTML(
+                'beforeend',
+                `<style>
+                    @keyframes moveParticle {
+                        0% { transform: translateY(0); opacity: 1; }
+                        100% { transform: translateY(-100vh); opacity: 0; }
+                    }
+                </style>`
+            );
+    </script>
+</body>
+</html>

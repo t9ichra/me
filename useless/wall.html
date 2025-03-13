@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        // Get canvas context
+const canvas = document.createElement('canvas');
+canvas.width = 600;
+canvas.height = 400;
+const ctx = canvas.getContext('2d');
+
+// Function to create basic wall background
+function drawBasicWall() {
+    // Base wall color - warm brown shade
+    ctx.fillStyle = '#8B7355';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+// Function to create textured wall with pattern
+function drawTexturedWall() {
+    // Base color
+    ctx.fillStyle = '#8B7355';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add subtle texture pattern
+    for(let i = 0; i < canvas.width; i += 20) {
+        for(let j = 0; j < canvas.height; j += 20) {
+            if(Math.random() > 0.5) {
+                ctx.fillStyle = 'rgba(0,0,0,0.05)';
+                ctx.fillRect(i, j, 20, 20);
+            }
+        }
+    }
+}
+
+// Function to create gradient textured wall
+function drawGradientWall() {
+    // Create gradient
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, '#8B7355');    // Base color
+    gradient.addColorStop(0.5, '#97805F');  // Slightly lighter
+    gradient.addColorStop(1, '#8B7355');    // Back to base
+    
+    // Apply gradient
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add texture
+    for(let i = 0; i < canvas.width; i += 20) {
+        for(let j = 0; j < canvas.height; j += 20) {
+            if(Math.random() > 0.7) {
+                ctx.fillStyle = 'rgba(0,0,0,0.03)';
+                ctx.fillRect(i, j, 20, 20);
+            }
+        }
+    }
+}
+
+// Function to create detailed textured wall
+function drawDetailedWall() {
+    // Base color
+    ctx.fillStyle = '#8B7355';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add multiple layers of texture
+    for(let size = 20; size >= 5; size -= 5) {
+        for(let i = 0; i < canvas.width; i += size) {
+            for(let j = 0; j < canvas.height; j += size) {
+                if(Math.random() > 0.7) {
+                    ctx.fillStyle = `rgba(0,0,0,${0.02 * (size/5)})`;
+                    ctx.fillRect(i, j, size, size);
+                }
+            }
+        }
+    }
+}
+
+// Draw all examples
+function drawExamples() {
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Divide canvas into sections
+    const sectionWidth = canvas.width / 2;
+    const sectionHeight = canvas.height / 2;
+    
+    // Save current context
+    ctx.save();
+    
+    // Draw each variation in a section
+ 
+    
+  
+    ctx.translate(sectionWidth, 0);
+    ctx.beginPath();
+    ctx.rect(0, 0, sectionWidth, sectionHeight);
+    ctx.clip();
+    drawTexturedWall();
+    
+    ctx.restore();
+    ctx.save();
+    
+    
+    
+    ctx.translate(sectionWidth, sectionHeight);
+    ctx.beginPath();
+    ctx.rect(0, 0, sectionWidth, sectionHeight);
+    ctx.clip();
+    drawDetailedWall();
+    
+    ctx.restore();
+}
+
+// Initial draw
+drawExamples();
+
+// Add to document
+document.body.appendChild(canvas);
+    </script>
+</body>
+
+</html>

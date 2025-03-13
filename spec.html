@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creepy Spectator Mode</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Courier New', monospace;
+      background-color: #c0b9b9;
+    }
+    
+    .spectator-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    .broken-overlay {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0.7;
+    }
+    
+    .controls {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 25px;
+      z-index: 20;
+    }
+    
+    .arrow-button {
+      width: 60px;
+      height: 60px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .arrow-left {
+      clip-path: polygon(40% 0%, 0% 50%, 40% 100%, 40% 65%, 100% 65%, 100% 35%, 40% 35%);
+      background: rgba(80, 0, 0, 0.8);
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+    }
+    
+    .arrow-right {
+      clip-path: polygon(60% 0%, 100% 50%, 60% 100%, 60% 65%, 0% 65%, 0% 35%, 60% 35%);
+      background: rgba(80, 0, 0, 0.8);
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+    }
+    
+    .arrow-button:hover {
+      transform: scale(1.1);
+    }
+    
+    .arrow-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      animation: bloodPulse 3s infinite;
+    }
+    
+    .player-name {
+      color: #ff0000;
+      font-size: 22px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 0 8px rgba(255, 0, 0, 0.7);
+    }
+    
+    .spectator-text {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: rgba(255, 0, 0, 0.7);
+      font-size: 22px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      z-index: 20;
+      font-weight: bold;
+      animation: flicker 4s infinite;
+    }
+    
+    .vignette {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.9);
+      z-index: 5;
+    }
+    
+    @keyframes flicker {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 0.3; }
+    }
+    
+    .recording-indicator {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      align-items: center;
+      z-index: 20;
+      font-size: 30px;
+      color: white;
+      text-shadow: 0 0 3px #000;
+    }
+    
+    .rec-dot {
+      width: 12px;
+      height: 12px;
+      background-color: #ff0000;
+      border-radius: 50%;
+      margin-right: 8px;
+      animation: blink 1.5s infinite;
+    }
+    
+    .rec-text {
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: bold;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    
+    .dirty-lens {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      pointer-events: none;
+    }
+    
+    .dirt-spot {
+      position: absolute;
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 50%;
+      filter: blur(15px);
+    }
+    
+    /* New Camera UI elements */
+    .camera-ui {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 15;
+      font-family: 'Courier New', monospace;
+      color: rgba(255, 255, 255, 0.8);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+    }
+    
+    .battery-indicator {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+    }
+    
+    .battery-icon {
+      width: 30px;
+      height: 15px;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      border-radius: 2px;
+      margin-right: 5px;
+      position: relative;
+    }
+    
+    .battery-icon:after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: 3px;
+      height: 9px;
+      width: 2px;
+      background: rgba(255, 255, 255, 0.8);
+    }
+    
+    .battery-level {
+      position: absolute;
+      left: 2px;
+      top: 2px;
+      height: 11px;
+      width: 17px;
+      background-color: #ff3030;
+      animation: batteryPulse 5s infinite;
+    }
+    
+    @keyframes batteryPulse {
+      0%, 100% { background-color: #ff3030; }
+      50% { background-color: #ff6060; }
+    }
+    
+    .recording-time {
+      position: absolute;
+      top: 50px;
+      right: 20px;
+      font-size: 16px;
+      letter-spacing: 1px;
+    }
+    
+    .date-time {
+      position: absolute;
+      bottom: 80px;
+      right: 20px;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    
+    .focus-indicator {
+      position: absolute;
+      bottom: 120px;
+      left: 20px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .focus-text {
+      text-transform: uppercase;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+    
+    .focus-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #ff0000;
+      border-radius: 50%;
+      margin-right: 2px;
+    }
+    
+    .camera-mode {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .camera-settings {
+      position: absolute;
+      top: 700px;
+      left: 20px;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .frame-counter {
+      position: absolute;
+      top: 50px;
+      left: 20px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .timecode {
+      position: absolute;
+      top: 60px; 
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .timecode-text {
+      position: relative;
+    }
+    
+    .timecode-text::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="spectator-container">
+   
+    <div class="game-view"></div>
+    
+   
+    <div class="broken-overlay" id="brokenOverlay"></div>
+    <div class="static-effect"></div>
+    <div class="vignette"></div>
+    <div class="dirty-lens" id="dirtyLens"></div>
+    
+  
+    <div class="recording-indicator">
+      <div class="rec-dot"></div>
+      <div class="rec-text">REC</div>
+    </div>
+    
+    <div class="spectator-text">YOU ARE DEAD - SPECTATING</div>
+    
+    <div class="camera-ui">
+      <div class="battery-indicator">
+        <div class="battery-icon">
+          <div class="battery-level"></div>
+        </div>
+        <span>29%</span>
+      </div>
+      
+      <div class="recording-time" id="recordingTime">00:13:47</div>
+      
+      <div class="date-time">
+        <div id="currentDate">03/02/2025</div>
+        <div id="currentTime">23:17:05</div>
+      </div>
+      
+      <div class="camera-mode">NIGHT VISION - AUTO</div>
+         
+     
+      <div class="camera-settings">
+        <div>ISO: 1600</div>
+        <div>f/2.8</div>
+        <div>1/30s</div>
+      </div>
+      
+      
+      <div class="timecode">
+        <span>TC:</span>
+        <span class="timecode-text" id="timecodeDisplay">01:23:47:18</span>
+      </div>
+    </div>
+    
+    
+    <div class="controls">
+      <div class="arrow-button" id="leftButton">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 18l-6-6 6-6" stroke="#ff0000" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="player-name">Haitham</div>
+      <div class="arrow-button" id="rightButton">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 18l6-6-6-6" stroke="#ff0000" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <script>
+   
+    
+    function addPulsingEffect() {
+      const playerName = document.querySelector('.player-name');
+      let intensity = 0.5;
+      let increasing = true;
+      
+      setInterval(() => {
+        if (increasing) {
+          intensity += 0.02;
+          if (intensity >= 1) increasing = false;
+        } else {
+          intensity -= 0.02;
+          if (intensity <= 0.5) increasing = true;
+        }
+        
+        playerName.style.textShadow = `0 0 ${5 * intensity}px rgba(255, 0, 0, ${intensity})`;
+      }, 50);
+    }
+    
+    function updateRecordingTime() {
+      let seconds = 827; 
+      const recordingTimeElement = document.getElementById('recordingTime');
+      const timecodeElement = document.getElementById('timecodeDisplay');
+      
+      setInterval(() => {
+        seconds++;
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        
+        recordingTimeElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        
+       
+        const frames = Math.floor(Math.random() * 24);
+        timecodeElement.textContent = `01:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${frames.toString().padStart(2, '0')}`;
+      }, 1000);
+    }
+    
+    function updateBatteryLevel() {
+      const batteryLevel = document.querySelector('.battery-level');
+      let level = 29;
+      let width = (level / 100) * 26;
+      batteryLevel.style.width = `${width}px`;
+      
+    
+      setInterval(() => {
+        if (level > 0) {
+          level -= 0.1;
+          width = (level / 100) * 26;
+          batteryLevel.style.width = `${width}px`;
+          document.querySelector('.battery-indicator span').textContent = `${Math.floor(level)}%`;
+          
+          
+          if (level < 10) {
+            batteryLevel.style.animation = 'batteryPulse 0.5s infinite';
+          }
+        }
+      }, 10000); 
+    }
+    
+    function updateClock() {
+      const dateElement = document.getElementById('currentDate');
+      const timeElement = document.getElementById('currentTime');
+      
+      setInterval(() => {
+        const now = new Date();
+        
+        
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+        
+       
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const year = now.getFullYear();
+        dateElement.textContent = `${month}/${day}/${year}`;
+      }, 1000);
+    }
+    
+   
+   
+    window.onload = function() {
+     
+      addPulsingEffect();
+      updateRecordingTime();
+      updateBatteryLevel();
+      updateClock();
+    
+      
+      document.getElementById('leftButton').addEventListener('click', () => {
+        console.log('Previous player');
+      });
+      
+      document.getElementById('rightButton').addEventListener('click', () => {
+        console.log('Next player');
+      });
+    };
+  </script>
+</body>
+</html>

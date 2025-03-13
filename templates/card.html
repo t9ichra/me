@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #1a1a1a;
+      font-family: 'Times New Roman', serif;
+      overflow: hidden;
+    }
+    .container {
+      display: flex;
+      position: relative;
+      gap: 20px;
+      transform: skew(-5deg);
+      z-index: 2;
+    }
+    .card {
+      width: 300px;
+      height: 400px;
+      background: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.5s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.3;
+      transition: opacity 0.5s ease;
+      filter: grayscale(100%);
+    }
+    .card:hover::before {
+      opacity: 1;
+      filter: grayscale(0%);
+    }
+    .card h2 {
+      color: white;
+      font-size: 2.5em;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease;
+    }
+    .card.ranked::before {
+      background-image: url('sword.png');
+    
+    }
+    .card.classic::before {
+      background-image: url('crow.jpg');
+     
+    }
+    .card:hover h2 {
+      transform: scale(1.1);
+      text-shadow: 0 0 10px #ff0000;
+    }
+
+    .card.ranked:hover {
+      background: linear-gradient(45deg, #000000, #800000);
+    }
+    .card.classic:hover {
+      background: linear-gradient(45deg, #000000, #400000);
+    }
+
+    .fire {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 50px;
+        background: linear-gradient(to top, #e02343, transparent);
+        animation: flicker 1.5s infinite;
+    }
+
+    @keyframes flicker {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
+    }
+
+    #particles-js {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    ::selection {
+        background-color: #660000;
+        color: #ffffff;
+        text-shadow: 0 0 8px #ff0000;
+    }
+
+    .header-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+    }
+
+    .interface-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .left-buttons, .right-buttons {
+        position: absolute;
+        display: none;
+        gap: 10px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .left-buttons {
+        right: 100%;
+        margin-right: 20px;
+    }
+
+    .right-buttons {
+        left: 100%;
+        margin-left: 20px;
+    }
+
+    .left-buttons.visible,
+    .right-buttons.visible {
+        display: flex;
+        opacity: 1;
+    }
+
+    .header {
+        width: 120px;
+        height: 80px;
+        border-radius: 60% 60% 50% 50%;
+        background: #892133;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: box-shadow 0.3s ease;
+    }
+
+    .header:hover {
+        box-shadow: 0 0 30px rgba(255, 0, 0, 1);
+    }
+
+    .header .eye {
+        position: relative;
+        width: 80px;
+        height: 60px;
+        background: #cbbb5f;
+        border-radius: 50%;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .eyelid {
+        position: absolute;
+        width: 100%;
+        height: 50%;
+        background: #550000;
+        left: 0;
+        z-index: 2;
+        animation: blink 4s infinite;
+    }
+
+    .eyelid.upper {
+        top: 0;
+        transform-origin: top;
+    }
+
+    .eyelid.lower {
+        bottom: 0;
+        transform-origin: bottom;
+    }
+
+    .header .pupil {
+        position: absolute;
+        width: 8px;
+        height: 35px;
+        background: black;
+        border-radius: 50%;
+        transition: transform 0.1s ease-out;
+        z-index: 1;
+    }
+
+    .header .pupil::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(
+            circle at center,
+            #000000 60%,
+            #440000 80%,
+            #000000 100%
+        );
+        border-radius: 50%;
+    }
+
+    button {
+        background: linear-gradient(90deg, #ff0000, #ae3131);
+        border: none;
+        border-radius: 2px;
+        padding: 10px 26px;
+        color: white;
+        font-weight: bold;
+        font-family: 'Times New Roman', Times, serif;
+        cursor: pointer;
+        text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+        animation: fadeInScale 0.5s ease forwards;
+    }
+
+    button:hover {
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.9);
+    }
+
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes blink {
+        0%, 95%, 100% {
+            transform: scaleY(0);
+        }
+        97.5% {
+            transform: scaleY(1);
+        }
+    }
+
+  </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="interface-container">
+            <div class="left-buttons">
+                <button>Welcome</button>
+                <button>Lore</button>
+            </div>
+            <div class="header" onclick="toggleButtons()">
+                <div class="eye">
+                    <div class="eyelid upper"></div>
+                    <div class="eyelid lower"></div>
+                    <div class="pupil"></div>
+                </div>
+            </div>
+            <div class="right-buttons">
+                <button>Profile</button>
+                <button>Logout</button>
+            </div>
+        </div>
+    </div>
+
+  <div class="container">
+    <div class="card ranked">
+      <h2>Ranked</h2>
+    </div>
+    <div class="card classic">
+      <h2>Classic</h2>
+    </div>
+  </div>
+  <div id="particles-js"></div>
+  <div class="fire"></div>
+</body>
+<script>
+    const particlesContainer = document.getElementById('particles-js');
+
+    const createParticle = () => {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+
+        const size = Math.random() * 5 + 2;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+
+        particle.style.position = 'absolute';
+        particle.style.background = 'red';
+        particle.style.borderRadius = '50%';
+
+        particle.style.left = `${Math.random() * 100}vw`;
+        particle.style.top = `${Math.random() * 100}vh`;
+        particle.style.opacity = Math.random();
+
+        const animationDuration = Math.random() * 5 + 2;
+        particle.style.animation = `moveParticle ${animationDuration}s linear infinite`;
+
+        particlesContainer.appendChild(particle);
+
+        setTimeout(() => {
+            particle.remove();
+        }, animationDuration * 1000);
+    };
+
+    setInterval(createParticle, 100);
+
+    document.head.insertAdjacentHTML(
+        'beforeend',
+        `<style>
+            @keyframes moveParticle {
+                0% { transform: translateY(0); opacity: 1; }
+                100% { transform: translateY(-100vh); opacity: 0; }
+            }
+        </style>`
+    );
+</script>
+<script>
+    const header = document.querySelector('.header');
+    const pupil = document.querySelector('.pupil');
+    const leftButtons = document.querySelector('.left-buttons');
+    const rightButtons = document.querySelector('.right-buttons');
+
+    function toggleButtons() {
+        leftButtons.classList.toggle('visible');
+        rightButtons.classList.toggle('visible');
+        
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach((btn, index) => {
+            btn.style.animationDelay = `${index * 0.1}s`;
+        });
+    }
+
+    document.addEventListener('mousemove', (event) => {
+        const rect = header.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        const dx = event.clientX - centerX;
+        const dy = event.clientY - centerY;
+        const angle = Math.atan2(dy, dx);
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        const maxDistance = 15;
+        const ratio = Math.min(maxDistance / distance, 1);
+
+        const offsetX = dx * ratio * 0.3;
+        const offsetY = dy * ratio * 0.3;
+
+        pupil.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    });
+
+    // Add random additional blinks
+    function addRandomBlink() {
+        const eyelids = document.querySelectorAll('.eyelid');
+        const randomDelay = Math.random() * 5000 + 2000; // Random delay between 2-7 seconds
+        
+        setTimeout(() => {
+            eyelids.forEach(eyelid => {
+                eyelid.style.animation = 'none';
+                eyelid.offsetHeight; // Trigger reflow
+                eyelid.style.animation = 'blink 4s infinite';
+            });
+            addRandomBlink();
+        }, randomDelay);
+    }
+
+    addRandomBlink();
+</script>
+</html>

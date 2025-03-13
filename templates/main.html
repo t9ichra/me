@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <title>3D Raycasting</title>
+    <link rel="stylesheet" href="main.css">
+    <style>
+        .modal {
+            font-family: 'Fantasy', sans-serif;
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 20;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: #1a1a1a;
+            border: 2px solid #252525;
+            border-radius: 10px;
+            padding: 30px;
+            width: 600px;
+            max-width: 90%;
+            color: #fff;
+            position: relative;
+            font-family: 'Fantasy', sans-serif;
+            box-shadow: 0 0 20px rgba(35, 34, 34, 0.3);
+        }
+        
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #ff0000;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #ff6666;
+        }
+        
+        h2 {
+            font-family: 'Fantasy', sans-serif;
+            color: #ff0000;
+            text-align: center;
+            margin-top: 0;
+            background-color:#1a1a1a;
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+        }
+        
+        #settingsForm {
+            font-family: 'Fantasy', sans-serif;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 20px;
+        }
+        
+        .setting-item {
+            font-family: 'Fantasy', sans-serif;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+        
+        .setting-item label {
+            font-family: 'Fantasy', sans-serif;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #ffffff;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .setting-item input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            border-radius: 5px;
+            outline: none;
+            margin-top: 5px;
+            font-family: 'Fantasy', sans-serif;
+        }
+        
+        .setting-item input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #ff0000;
+            border-radius: 50%;
+            cursor: pointer;
+            font-family: 'Fantasy', sans-serif;
+        }
+        
+        .key-binding {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #333;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            font-family: 'Fantasy', sans-serif;
+        }
+        
+        .key-display {
+            background-color: #222;
+            border: 1px solid #666;
+            padding: 5px 15px;
+            border-radius: 4px;
+            min-width: 35px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            font-family: 'Fantasy', sans-serif;
+        }
+        
+        .key-display:hover {
+            background-color: #444;
+            border-color: #888;
+            font-family: 'Fantasy', sans-serif;
+        }
+        
+        .key-display.active {
+            background-color: #ff0000;
+            border-color: #323131;
+            font-family: 'Fantasy', sans-serif;
+        }
+        
+        .submit-btn {
+            grid-column: span 2;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            padding: 12px;
+            margin-top: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: background-color 0.2s ease;
+            font-family: 'Fantasy', sans-serif;
+        }
+        
+        .submit-btn:hover {
+            background-color: #cc0000;
+        }
+        
+        .volume-slider {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+        
+
+#pauseMenuContent .volume-slider {
+    width: 100%;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+#pauseMenuContent .volume-slider input[type="range"] {
+    width: 80%;
+    flex-grow: 1;
+}
+
+#pauseMenuContent .volume-value {
+    text-align: right;
+    min-width: 45px;
+    margin-left: 15px;
+}
+
+#settingsForm .volume-slider input[type="range"] {
+    width: 80%;
+    flex-grow: 1;
+}
+
+#settingsForm .volume-slider {
+    justify-content: space-between;
+}
+
+        .volume-value {
+            margin-left: 10px;
+            min-width: 45px;
+            text-align: right;
+            background: #222;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+        
+        #pauseMenu {
+            font-family: 'Fantasy', sans-serif;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 10;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #pauseMenuContent {
+            font-family: 'Fantasy', sans-serif;
+            background-color: #1a1a1a;
+            border: 2px solid #202020;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+            width: 300px;
+            box-shadow: 0 0 20px rgba(69, 67, 67, 0.3);
+        }
+        
+        .volume-container {
+            font-family: 'Fantasy', sans-serif;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .volume-container label {
+            font-family: 'Fantasy', sans-serif;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #ffffff;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="pauseMenu">
+        <div id="pauseMenuContent">
+            <button id="closeButton">×</button>
+            <h1>Paused</h1>
+            <button id="resumeButton" class="pauseButton">Resume</button>
+            
+           
+            <div class="volume-container">
+                <label>Volume</label>
+                <div class="volume-slider">
+                    <input type="range" name="volumePause" min="0" max="100" value="50" id="pauseVolumeSlider">
+                    <span class="volume-value" id="pauseVolumeValue">50%</span>
+                </div>
+            </div>
+            
+            <button id="settingsButton">
+                <span id="settingsIcon">⚙️</span> Settings
+            </button>
+            <button id="leaveGameButton" class="pauseButton">Leave Game</button>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Settings</h2>
+            <form id="settingsForm">
+                <div class="setting-item">
+                    <label>Forward Key</label>
+                    <div class="key-binding">
+                        <span>Move Forward</span>
+                        <div class="key-display" data-action="forward">W</div>
+                    </div>
+                </div>
+                
+                <!-- Row 2 -->
+                <div class="setting-item">
+                    <label>Backward Key</label>
+                    <div class="key-binding">
+                        <span>Move Backward</span>
+                        <div class="key-display" data-action="backward">S</div>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Left Key</label>
+                    <div class="key-binding">
+                        <span>Move Left</span>
+                        <div class="key-display" data-action="left">A</div>
+                    </div>
+                </div>
+                
+                <!-- Row 3 -->
+                <div class="setting-item">
+                    <label>Right Key</label>
+                    <div class="key-binding">
+                        <span>Move Right</span>
+                        <div class="key-display" data-action="right">D</div>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Kill/Action Key</label>
+                    <div class="key-binding">
+                        <span>Kill/Action</span>
+                        <div class="key-display" data-action="kill">E</div>
+                    </div>
+                </div>
+                
+                <!-- Row 4 -->
+                <div class="setting-item">
+                    <label>Chat Key</label>
+                    <div class="key-binding">
+                        <span>Show Chat</span>
+                        <div class="key-display" data-action="chat">T</div>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Settings Key</label>
+                    <div class="key-binding">
+                        <span>Open Settings</span>
+                        <div class="key-display" data-action="settings">Esc</div>
+                    </div>
+                </div>
+                
+                
+                <button type="submit" class="submit-btn">Save Settings</button>
+            </form>
+        </div>
+    </div>
+
+    <canvas id="canvas" width="640" height="480"></canvas>
+    
+    <script src="settings.js"></script>
+    <script src="pause.js"></script>
+    <script src="game.js"></script> <!--MOST IMPORTANT ONE-->
+    
+    <script>
+        // This adds the key binding functionality while preserving your original scripts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Volume slider functionality - now handling both sliders
+            const volumeSlider = document.getElementById('volumeSlider');
+            const pauseVolumeSlider = document.getElementById('pauseVolumeSlider');
+            const settingsVolumeValue = document.getElementById('settingsVolumeValue');
+            const pauseVolumeValue = document.getElementById('pauseVolumeValue');
+            
+            
+            function syncVolume(value) {
+                if (volumeSlider) volumeSlider.value = value;
+                if (pauseVolumeSlider) pauseVolumeSlider.value = value;
+                if (settingsVolumeValue) settingsVolumeValue.textContent = value + '%';
+                if (pauseVolumeValue) pauseVolumeValue.textContent = value + '%';
+                
+           
+            }
+            
+          
+            if (volumeSlider) {
+                volumeSlider.addEventListener('input', function() {
+                    syncVolume(this.value);
+                });
+            }
+            
+            if (pauseVolumeSlider) {
+                pauseVolumeSlider.addEventListener('input', function() {
+                    syncVolume(this.value);
+                });
+            }
+            
+          
+            const keyDisplays = document.querySelectorAll('.key-display');
+            
+            keyDisplays.forEach(display => {
+                display.addEventListener('click', function() {
+                 
+                    keyDisplays.forEach(el => el.classList.remove('active'));
+                    
+                  
+                    this.classList.add('active');
+                    
+                  
+                    const action = this.dataset.action;
+                    
+                    const keyListener = function(e) {
+                        e.preventDefault();
+                        display.textContent = e.key.toUpperCase();
+                        display.classList.remove('active');
+                        document.removeEventListener('keydown', keyListener);
+                    };
+                    
+                    document.addEventListener('keydown', keyListener);
+                });
+            });
+            
+         
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'p') {
+                    document.getElementById('pauseMenu').style.display = 'flex';
+                }
+            });
+        });
+        
+       
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "F5" || 
+                (event.ctrlKey && event.key === "r") || 
+                (event.metaKey && event.key === "r")) {
+                event.preventDefault();
+            }
+        });
+
+        document.addEventListener("contextmenu", function(event) {
+            event.preventDefault();
+        });
+
+        window.onbeforeunload = function(event) {
+            event.preventDefault();
+            return "";  
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+<script>
+// Setup canvas
+const canvas = document.createElement('canvas');
+canvas.width = 500;
+canvas.height = 600;
+const ctx = canvas.getContext('2d');
+
+// Set background color
+ctx.fillStyle = '#8B7355'; // Wall color
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+// Draw main window frame
+function drawWindowFrame() {
+    // Outer frame shadow
+    ctx.fillStyle = '#4d4d4d';
+    ctx.fillRect(75, 75, 350, 450);
+    
+    // Outer frame
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(70, 70, 350, 450);
+    
+    // Inner frame
+    ctx.fillStyle = '#F5F5F5';
+    ctx.fillRect(90, 90, 310, 410);
+    
+    // Window sill
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(40, 520, 410, 30);
+    ctx.fillStyle = '#E8E8E8';
+    ctx.fillRect(40, 550, 410, 20);
+}
+
+// Draw window panes
+function drawWindowPanes() {
+    // Create dark window background
+    ctx.fillStyle = '#1a1a1a';
+    
+    // Draw four panes
+    const paneWidth = 135;
+    const paneHeight = 180;
+    const startX = 100;
+    const startY = 100;
+    const gap = 40;
+    
+    for (let row = 0; row < 2; row++) {
+        for (let col = 0; col < 2; col++) {
+            const x = startX + (paneWidth + gap) * col;
+            const y = startY + (paneHeight + gap) * row;
+            
+            // Window glass
+            ctx.fillStyle = '#4d4d4d';
+            ctx.fillRect(x, y, paneWidth, paneHeight);
+            
+            // Add glass reflection
+            const gradient = ctx.createLinearGradient(x, y, x + paneWidth, y + paneHeight);
+            gradient.addColorStop(0, '#4d4d4d');
+            gradient.addColorStop(0.5, '#4d4d4d');
+            gradient.addColorStop(1, '#4d4d4d');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(x, y, paneWidth, paneHeight);
+        }
+    }
+}
+
+// Draw wooden boards
+function drawBoard(x, y, width, height, angle) {
+    ctx.save();
+    ctx.translate(x + width/2, y + height/2);
+    ctx.rotate(angle);
+    
+    // Board shadow
+    ctx.fillStyle = '#3d2616';
+    ctx.fillRect(-width/2 + 5, -height/2 + 5, width, height);
+    
+    // Main board
+    ctx.fillStyle = '#614126';
+    ctx.fillRect(-width/2, -height/2, width, height);
+    
+    // Wood grain
+    ctx.strokeStyle = '#432918';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < width; i += 15) {
+        ctx.beginPath();
+        ctx.moveTo(-width/2 + i, -height/2);
+        ctx.lineTo(-width/2 + i, height/2);
+        ctx.stroke();
+    }
+    
+    // Nails
+    ctx.fillStyle = '#696969';
+    ctx.beginPath();
+    ctx.arc(-width/3, -height/3, 4, 0, Math.PI * 2);
+    ctx.arc(width/3, -height/3, 4, 0, Math.PI * 2);
+    ctx.arc(-width/3, height/3, 4, 0, Math.PI * 2);
+    ctx.arc(width/3, height/3, 4, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.restore();
+}
+
+// Draw barricades
+function drawBarricades() {
+    // Diagonal boards
+    drawBoard(50, 100, 400, 40, Math.PI / 6);
+    drawBoard(50, 500, 400, 40, -Math.PI / 6);
+    
+    // Horizontal boards
+    drawBoard(50, 250, 400, 45, 0);
+    drawBoard(50, 400, 400, 45, 0);
+}
+
+// Draw complete scene
+function drawScene() {
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw wall background
+    ctx.fillStyle = '#8B7355';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add wall texture
+    for(let i = 0; i < canvas.width; i += 20) {
+        for(let j = 0; j < canvas.height; j += 20) {
+            if(Math.random() > 0.5) {
+                ctx.fillStyle = 'rgba(0,0,0,0.05)';
+                ctx.fillRect(i, j, 20, 20);
+            }
+        }
+    }
+    
+    drawWindowFrame();
+    drawWindowPanes();
+    drawBarricades();
+}
+
+// Initial draw
+drawScene();
+
+// Add to document
+document.body.appendChild(canvas);
+</script>
+
+</body>
+</html>

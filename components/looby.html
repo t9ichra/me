@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost - Main Hub</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #800000;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: rgba(20, 20, 20, 0.9);
+            padding: 1rem;
+            border-bottom: 2px solid #800000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: 2rem;
+            color: #800000;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+        }
+
+        input {
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #800000;
+            color: #fff;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            background: #800000;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #600000;
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-box {
+            background: rgba(20, 20, 20, 0.9);
+            border: 1px solid #800000;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .info-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(128, 0, 0, 0.3);
+        }
+
+        .join-button {
+            display: block;
+            width: 200px;
+            margin: 2rem auto;
+            padding: 1rem;
+            font-size: 1.2rem;
+            text-align: center;
+            background: #800000;
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        footer {
+            background: rgba(20, 20, 20, 0.9);
+            padding: 1rem;
+            text-align: center;
+            border-top: 2px solid #800000;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: rgba(20, 20, 20, 0.95);
+            padding: 2rem;
+            border: 2px solid #800000;
+            max-width: 400px;
+            width: 100%;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            color: #800000;
+        }
+
+        .room-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">LOST</div>
+            <div class="search-bar">
+                <input type="text" placeholder="Search rooms...">
+                <button onclick="openModal()">Create Room</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="game-info">
+            <div class="info-box">
+                <h2>Welcome to the Void</h2>
+                <p>Enter a world of endless darkness where nothing is as it seems. Navigate through twisted realities and face your deepest fears.</p>
+            </div>
+            <div class="info-box">
+                <h2>Current Players</h2>
+                <p>666 lost souls currently wandering...</p>
+            </div>
+            <div class="info-box">
+                <h2>Active Rooms</h2>
+                <p>13 gateways to darkness await...</p>
+            </div>
+        </div>
+
+        <button class="join-button">JOIN THE DARKNESS</button>
+    </main>
+
+    <footer>
+        <p>© 2025 LOST - Where Sanity Comes to Die</p>
+    </footer>
+
+    <div class="modal" id="roomModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>

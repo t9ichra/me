@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LOST - The Maze of Whispers</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Darker+Grotesque:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Nosifer&display=swap');
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Darker Grotesque', sans-serif;
+            background-color: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        ::selection {
+            background-color: #660000;
+            color: #ffffff;
+            text-shadow: 0 0 8px #ff0000;
+        }
+
+        .particle {
+            position: fixed;
+            background: rgba(255, 0, 0, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+
+
+        @keyframes moveBackground {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 44px 44px;
+            }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .title {
+            font-family: 'Nosifer', cursive;
+            font-size: 5rem;
+            text-align: center;
+            color: #ff0000;
+            margin-top: 50px;
+            margin-bottom: 50px;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            animation: pulseTitle 3s ease-in-out infinite;
+        }
+
+        @keyframes pulseTitle {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 20px rgba(255, 0, 0, 0.5); }
+            50% { transform: scale(1.05); text-shadow: 0 0 30px rgba(255, 0, 0, 0.8); }
+        }
+
+        .content p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .content p.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .highlight {
+            color: #ff4444;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+            animation: glowText 2s ease-in-out infinite;
+        }
+
+        @keyframes glowText {
+            0%, 100% { text-shadow: 0 0 10px rgba(255, 0, 0, 0.3); }
+            50% { text-shadow: 0 0 20px rgba(255, 0, 0, 0.6); }
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 60px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            z-index: 3;
+        }
+
+        .scroll-indicator::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: #ffffff;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            animation: scrollIndicator 2s infinite;
+        }
+
+        @keyframes scrollIndicator {
+            0% { top: 8px; opacity: 1; }
+            50% { top: 24px; opacity: 0.5; }
+            100% { top: 8px; opacity: 1; }
+        }
+
+        .fire {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(to top, #7c1829, transparent);
+            animation: flicker 1.5s infinite;
+        }
+
+        ::selection {
+            background-color: #660000;
+            color: #ffffff;
+            text-shadow: 0 0 8px #ff0000;
+        }
+
+
+        
+        .header {
+            width: 120px;
+            height: 80px;
+            border-radius: 60% 60% 50% 50%;
+            background: radial-gradient(circle, #610c0c, #550000);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .header:hover {
+            box-shadow: 0 0 30px rgba(255, 0, 0, 1);
+        }
+
+        .header .eye {
+            position: relative;
+            width: 80px;
+            height: 60px;
+            background: #cbbb5f;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header .pupil {
+            position: absolute;
+            width: 8px;
+            height: 35px;
+            background: black;
+            border-radius: 50%;
+            transition: transform 0.1s ease-out;
+            z-index: 1;
+        }
+
+        .header .pupil::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(
+                circle at center,
+                #000000 60%,
+                #440000 80%,
+                #000000 100%
+            );
+            border-radius: 50%;
+        }
+
+        button {
+            background: linear-gradient(90deg, #ff0000, #550000);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            color: white;
+            cursor: pointer;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+            animation: fadeInScale 0.5s ease forwards;
+        }
+
+        button:hover {
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.9);
+        }
+
+        .buttons button {
+            animation: fadeInScale 0.5s ease forwards;
+        }
+        
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes blink {
+            0%, 95%, 100% {
+                transform: scaleY(0);
+            }
+            97.5% {
+                transform: scaleY(1);
+            }
+        }
+        .header-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        
+        .interface-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .left-buttons, .right-buttons {
+            position: absolute;
+            display: none;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .left-buttons {
+            right: 100%;
+            margin-right: 20px;
+        }
+
+        .right-buttons {
+            left: 100%;
+            margin-left: 20px;
+        }
+
+        .left-buttons.visible,
+        .right-buttons.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+
+        .eyelid {
+            position: absolute;
+            width: 100%;
+            height: 50%;
+            background: #550000;
+            left: 0;
+            z-index: 2;
+            animation: blink 4s infinite;
+        }
+
+        .eyelid.upper {
+            top: 0;
+            transform-origin: top;
+        }
+
+        .eyelid.lower {
+            bottom: 0;
+            transform-origin: bottom;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="interface-container">
+            <div class="left-buttons">
+                <button>Option 1</button>
+                <button>Option 2</button>
+                <button>Option 3</button>
+            </div>
+            <div class="header" onclick="toggleButtons()">
+                <div class="eye">
+                    <div class="eyelid upper"></div>
+                    <div class="eyelid lower"></div>
+                    <div class="pupil"></div>
+                </div>
+            </div>
+            <div class="right-buttons">
+                <button>Option 4</button>
+                <button>Option 5</button>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h1 class="title">LOST</h1>
+        <div id="particles-js"></div>
+        <div class="content">
+            <p>In the heart of a forsaken town lies a mansion, forgotten by time and wrapped in an unsettling silence. Its towering gates, rusted and chained, stand as a grim warning to those who dare to enter. The mansion, once a place of grandeur, is now a shell of its former self, its cracked walls and shattered windows whispering secrets that have lingered for decades.</p>
+            
+            <p>One moonlit evening, a group of adventurous teens found themselves drawn to the mansion's overgrown garden. What began as a dare quickly turned into a game of courage as they explored the sprawling grounds. Hidden among the thorns and ivy was a discovery that filled them with both wonder and trepidation—a massive, ancient <span class="highlight">maze</span>.</p>
+            
+            <p>But the maze was no ordinary labyrinth. The air grew colder with every step, and the laughter of the teens faded as the towering hedges seemed to close in around them. Paths they had just walked moments before disappeared, replaced by dead ends and unfamiliar twists.</p>
+            
+            <p>Then came the first scream.</p>
+            
+            <p>It started as a faint rustle in the distance, but soon the teens realized they were not alone. A monstrous figure emerged from the shadows—a grotesque entity known only as <span class="highlight">The Hunter</span>. Its movements were eerily silent, save for the occasional crunch of leaves beneath its clawed feet.</p>
+            
+            <p>Panic consumed the group as they ran through the maze, their breaths quickening with every turn. It was during their frantic escape that they discovered keys hidden throughout the labyrinth—ancient, rusted keys that seemed to hold an inexplicable power.</p>
+            
+            <p>The maze, however, was cruel. It toyed with them, shifting its paths and trapping them in loops. The Hunter grew bolder, its presence a constant, suffocating terror. Whispers echoed through the air—whether from the maze or something else, none could say.</p>
+            
+            <p>Their only chance of survival lies in the keys, but each step toward escape comes at a price. The maze demands sacrifices—whether it be their sanity, their friendships, or their very lives.</p>
+            
+            <p>Will they outsmart the maze and escape the clutches of The Hunter, or will their names be added to the long list of souls claimed by the cursed grounds? One thing is certain—once you enter the maze, it never truly lets you go.</p>
+        </div>
+    </div>
+    <div class="fire"></div>
+    <div class="scroll-indicator"></div>
+
+    <script>
+        const particlesContainer = document.getElementById('particles-js');
+
+        const createParticle = () => {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+
+            const size = Math.random() * 5 + 2;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+
+            particle.style.position = 'absolute';
+            particle.style.background = 'red';
+            particle.style.borderRadius = '50%';
+
+            particle.style.left = `${Math.random() * 100}vw`;
+            particle.style.top = `${Math.random() * 100}vh`;
+            particle.style.opacity = Math.random();
+
+            const animationDuration = Math.random() * 5 + 2;
+            particle.style.animation = `moveParticle ${animationDuration}s linear infinite`;
+
+            particlesContainer.appendChild(particle);
+
+            setTimeout(() => {
+                particle.remove();
+            }, animationDuration * 1000);
+        };
+
+        setInterval(createParticle, 100);
+
+        document.head.insertAdjacentHTML(
+            'beforeend',
+            `<style>
+                @keyframes moveParticle {
+                    0% { transform: translateY(0); opacity: 1; }
+                    100% { transform: translateY(-100vh); opacity: 0; }
+                }
+            </style>`
+        );
+
+        // Scroll animation for paragraphs
+        function checkVisible() {
+            const paragraphs = document.querySelectorAll('.content p');
+            paragraphs.forEach(p => {
+                const rect = p.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+                
+                if (rect.top < windowHeight - 100) {
+                    p.classList.add('visible');
+                }
+            });
+        }
+
+        let lastScrollY = window.scrollY;
+
+        function handleScrollDirection() {
+            const currentScrollY = window.scrollY;
+            const isScrollingUp = currentScrollY < lastScrollY;
+
+            const paragraphs = document.querySelectorAll('.content p');
+            paragraphs.forEach(p => {
+                if (isScrollingUp) {
+                    p.classList.add('scroll-up-animation');
+                } else {
+                    p.classList.remove('scroll-up-animation');
+                }
+            });
+
+            lastScrollY = currentScrollY;
+        }
+
+        window.addEventListener('scroll', handleScrollDirection);
+
+        // Initial check and scroll listener
+        window.addEventListener('scroll', checkVisible);
+        window.addEventListener('load', checkVisible);
+
+
+        const header = document.querySelector('.header');
+        const pupil = document.querySelector('.pupil');
+        const leftButtons = document.querySelector('.left-buttons');
+        const rightButtons = document.querySelector('.right-buttons');
+
+        function toggleButtons() {
+            leftButtons.classList.toggle('visible');
+            rightButtons.classList.toggle('visible');
+            
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach((btn, index) => {
+                btn.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+
+        document.addEventListener('mousemove', (event) => {
+            const rect = header.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const dx = event.clientX - centerX;
+            const dy = event.clientY - centerY;
+            const angle = Math.atan2(dy, dx);
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            const maxDistance = 15;
+            const ratio = Math.min(maxDistance / distance, 1);
+
+            const offsetX = dx * ratio * 0.3;
+            const offsetY = dy * ratio * 0.3;
+
+            pupil.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+        });
+
+        // Add random additional blinks
+        function addRandomBlink() {
+            const eyelids = document.querySelectorAll('.eyelid');
+            const randomDelay = Math.random() * 5000 + 2000; // Random delay between 2-7 seconds
+            
+            setTimeout(() => {
+                eyelids.forEach(eyelid => {
+                    eyelid.style.animation = 'none';
+                    eyelid.offsetHeight; // Trigger reflow
+                    eyelid.style.animation = 'blink 4s infinite';
+                });
+                addRandomBlink();
+            }, randomDelay);
+        }
+
+        addRandomBlink();
+    </script>
+</body>
+</html>

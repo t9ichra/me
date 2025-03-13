@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Wall with Flowers</title>
+</head>
+<body style="margin: 50; background: rgb(26, 105, 10);">
+    <canvas id="canvas"></canvas>
+    <script>
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = 800;
+canvas.height = 600;
+
+// Darker base green wall
+ctx.fillStyle = '#1a3318';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+// Add darker texture variations
+for (let i = 0; i < 1000; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const size = Math.random() * 5;
+    ctx.fillStyle = `rgba(${10 + Math.random() * 30}, ${40 + Math.random() * 30}, ${10 + Math.random() * 30}, 0.4)`;
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+// Add climbing vines
+
+    
+
+// Add blood stains
+for (let i = 0; i < 8; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    
+    ctx.fillStyle = '#660000';
+    ctx.beginPath();
+    ctx.arc(x, y, 20, 0, Math.PI * 2);
+    ctx.fill();
+    
+    const drips = Math.random() * 5 + 3;
+    for (let j = 0; j < drips; j++) {
+        const length = Math.random() * 70 + 30;
+        ctx.beginPath();
+        ctx.moveTo(x + Math.random() * 10 - 5, y);
+        ctx.quadraticCurveTo(
+            x + Math.random() * 20 - 10,
+            y + length / 2,
+            x + Math.random() * 20 - 10,
+            y + length
+        );
+        ctx.lineWidth = Math.random() * 5 + 3;
+        ctx.strokeStyle = '#660000';
+        ctx.stroke();
+    }
+}
+
+// Add spikes
+/* for (let i = 0; i < 2; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const height = Math.random() * 60 + 40;
+    const width = Math.random() * 20 + 10;
+    
+    ctx.beginPath();
+    ctx.moveTo(x - width, y);
+    ctx.lineTo(x + width, y);
+    ctx.lineTo(x, y - height);
+    ctx.closePath();
+    
+    const gradient = ctx.createLinearGradient(x - width, y, x + width, y);
+    gradient.addColorStop(0, '#2b2b2b');
+    gradient.addColorStop(0.5, '#4a4a4a');
+    gradient.addColorStop(1, '#2b2b2b');
+    ctx.fillStyle = gradient;
+    ctx.fill();
+    
+  //  if (Math.random() < 0.4) {
+        // ctx.beginPath();
+       // ctx.moveTo(x, y - height);
+      //  ctx.lineTo(x + 5, y - height + 15);
+     //   ctx.lineTo(x - 5, y - height + 15);
+    //    ctx.closePath();
+     //   ctx.fillStyle = '#660000';
+    //    ctx.fill();
+  //  }
+//} 
+*/
+// Add darker leaves
+for (let i = 0; i < 150; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const size = Math.random() * 15 + 10;
+    const rotation = Math.random() * Math.PI * 2;
+    
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rotation);
+    
+    ctx.beginPath();
+    ctx.fillStyle = `rgb(${30 + Math.random() * 20}, ${60 + Math.random() * 30}, ${20 + Math.random() * 15})`;
+    ctx.moveTo(0, -size/2);
+    ctx.quadraticCurveTo(size/2, 0, 0, size/2);
+    ctx.quadraticCurveTo(-size/2, 0, 0, -size/2);
+    ctx.fill();
+    
+    ctx.restore();
+}
+
+// Function to draw a flower
+function drawFlower(x, y, size, color) {
+    // Draw flower petals
+    for (let j = 0; j < 5; j++) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate((j * Math.PI * 2) / 5);
+        
+        // Create petal shape
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(size, -size, 0, -size * 2);
+        ctx.quadraticCurveTo(-size, -size, 0, 0);
+        ctx.fill();
+        
+        ctx.restore();
+    }
+    
+    // Add flower center
+    ctx.beginPath();
+    ctx.arc(x, y, size/3, 0, Math.PI * 2);
+    ctx.fillStyle = '#4a0404';
+    ctx.fill();
+}
+
+// Add pink flowers
+for (let i = 0; i < 2; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const size = Math.random() * 10 + 8;
+    drawFlower(x, y, size, '#ff69b4');
+}
+
+// Add white flowers
+for (let i = 0; i < 3; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const size = Math.random() * 10 + 8;
+    drawFlower(x, y, size, '#ffffff');
+}
+
+// Optional: Add to document
+window.mossyWallTexture = canvas;
+document.body.appendChild(canvas);
+    </script>
+</body>
+</html>

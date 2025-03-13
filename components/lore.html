@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost - Lore</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #800000;
+            font-family: 'UnifrakturMaguntia', cursive;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .lore-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            border: 1px solid #800000;
+            background-color: rgba(0, 0, 0, 0.9);
+            position: relative;
+        }
+
+        .lore-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .lore-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, transparent 90%, #800000 100%);
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #b00;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            text-align: justify;
+        }
+
+        .flicker {
+            animation: flicker 5s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+            25%, 75% { opacity: 0.9; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="flicker">The Lost Chronicles</h1>
+        
+        <div class="lore-section">
+            <h2>The Beginning of Darkness</h2>
+            <p>In the depths of forgotten realms, where shadows whisper ancient secrets, our tale begins. The year was 1873, when the first disappearances occurred...</p>
+        </div>
+
+        <div class="lore-section">
+            <h2>The Curse of the Wandering</h2>
+            <p>They say those who venture too deep into the forest never return the same. The trees themselves seem to shift and change, leading travelers astray...</p>
+        </div>
+
+        <div class="lore-section">
+            <h2>The Hidden Truth</h2>
+            <p>Legends speak of a force that dwells beneath the earth, ancient and malevolent. Its influence spreads like tendrils through the soil...</p>
+        </div>
+    </div>
+
+    <script>
+        const sections = document.querySelectorAll('.lore-section');
+        
+        const observerOptions = {
+            threshold: 0.2
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>

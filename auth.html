@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost - Authentication</title>
+   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nosifer&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+       
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 50% 50%, transparent 0%, rgba(0,0,0,0.9) 100%),
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h100v100H0z' fill='%23200000'/%3E%3Cpath d='M10 10h80v80H10z' fill='%23300000'/%3E%3Cpath d='M20 20h60v60H20z' fill='%23400000'/%3E%3C/svg%3E");
+            animation: backgroundShift 30s linear infinite;
+            z-index: -2;
+        }
+
+      
+        @keyframes backgroundShift {
+            0% { background-position: 0 0; }
+            100% { background-position: 100% 100%; }
+        }
+
+         .container {
+            position: relative;
+            width: 400px;
+            padding: 2rem;
+            background: rgba(10, 10, 10, 0.95);
+            border: 2px solid #800000;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            transform-style: preserve-3d;
+            transition: transform 1s ease-in-out;
+        }
+
+        .container.flip {
+            transform: rotateY(180deg);
+        }
+
+        .form-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(20, 0, 0, 0.7);
+            border: 1px solid #800000;
+            color: #fff;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 25%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            z-index: 2;
+        }
+
+    
+
+        input:focus {
+            outline: none;
+            border-color: #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        button[type="submit"] {
+            width: 60%;
+            margin: 0 auto;
+            display: block;
+            padding: 0.8rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: #800000;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        button:hover {
+            background: #600000;
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        .ghost {
+            position: fixed;
+            pointer-events: none;
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.1);
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg) scale(1);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(100px, -100px) rotate(180deg) scale(1.5);
+                opacity: 0.3;
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .switch-form {
+            text-align: center;
+            margin-top: 1rem;
+            color: #ffffff;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .switch-form:hover {
+            color: #ff0000;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+        }
+
+        .form-title {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            font-family: 'Courier New', monospace;
+            text-shadow: 2px 2px 4px rgba(255, 0, 0, 0.5);
+            animation: creepyTitle 3s infinite;
+        }
+
+       @keyframes creepyTitle {
+            0%, 100% { 
+                transform: translate(0) skew(0deg);
+                text-shadow: 2px 2px 4px #ff0000, -2px -2px 4px #800000;
+                filter: blur(0px);
+            }
+            25% { 
+                transform: translate(-2px, 2px) skew(2deg);
+                text-shadow: -3px 2px 4px #ff0000, 3px -2px 4px #800000;
+                filter: blur(1px);
+            }
+            50% {
+                transform: translate(0) skew(-3deg);
+                text-shadow: 4px 4px 8px #ff0000, -4px -4px 8px #800000;
+                filter: blur(2px);
+            }
+            75% { 
+                transform: translate(2px, -2px) skew(-2deg);
+                text-shadow: 2px -3px 4px #ff0000, -2px 3px 4px #800000;
+                filter: blur(1px);
+            }
+        }
+
+        .pentagram {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            opacity: 0.1;
+            animation: rotate 20s infinite linear;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+   
+        .blood-drip {
+            position: absolute;
+            top: 0;
+            width: 8px;
+            height: 40px;
+            background: linear-gradient(to bottom, 
+                #800000 0%,
+                #ff0000 40%,
+                rgba(128, 0, 0, 0.8) 80%,
+                transparent 100%);
+            filter: blur(1px);
+            border-radius: 50%;
+            animation: drip 3s infinite;
+            opacity: 0;
+
+        }
+
+        .blood-drip::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 16px;
+            background: #800000;
+            border-radius: 50%;
+            filter: blur(2px);
+        }
+
+         @keyframes drip {
+            0% {
+                height: 0;
+                top: 0;
+                opacity: 1;
+            }
+            70% {
+                opacity: 1;
+            }
+            100% {
+                height: 200px;
+                top: 100%;
+                opacity: 0;
+            }
+        }
+
+        ::selection {
+            background-color: #660000;
+            color: #ffffff;
+            text-shadow: 0 0 8px #ff0000;
+        }
+
+        input[type="password"], 
+        input[type="text"] {
+            padding-right: 35px; 
+        }
+
+        .error-popup {
+            position: absolute;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            background-color: rgba(80, 0, 0, 0.95);
+            color: white;
+            padding: 15px 20px;
+            border: 1px solid #ff0000;
+            border-radius: 5px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            animation: pulseError 2s infinite;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Courier New', monospace;
+            text-shadow: 1px 1px 3px #000;
+            letter-spacing: 1px;
+        }
+
+        @keyframes pulseError {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); background-color: rgba(80, 0, 0, 0.95); }
+            50% { box-shadow: 0 0 30px rgba(255, 0, 0, 0.8); background-color: rgba(100, 0, 0, 0.95); }
+        }
+
+        .error-popup .close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .error-popup .close-btn:hover {
+            color: #ff0000;
+            transform: scale(1.2);
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+        }
+
+        .error-popup p {
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .error-icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+   </style>
+</head>
+<body>
+    <div class="container">
+        <svg class="pentagram" viewBox="0 0 100 100">
+            <path d="M50 5 L61 40 L97 40 L68 62 L79 95 L50 75 L21 95 L32 62 L3 40 L39 40 Z" 
+                  fill="none" 
+                  stroke="#800000" 
+                  stroke-width="0.5"/>
+        </svg>
+
+        {% if error_message %}
+        <div id="errorPopup" class="error-popup">
+            <span class="error-icon">⚠️</span>
+            <p id="errorMessage">{{ error_message }}</p>
+            <button class="close-btn" onclick="closePopup()">✕</button>
+        </div>
+        {% endif %}
+
+        <div id="loginForm">
+            <h1 class="form-title">LOG IN</h1>
+            <form action="/login" method="POST">
+                <div class="form-group">
+                    <input type="email" placeholder="Your Damned Email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" name="password" placeholder="Dark Secret" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">
+                        👁️
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button type="submit">ENTER</button>
+                </div>
+                <div class="switch-form" onclick="toggleForm()">
+                    Not yet damned? Sign the blood pact...
+                </div>
+            </form>
+        </div>
+
+        <div id="signupForm" style="display: none;">
+            <h1 class="form-title">SIGN UP</h1>
+            <form action="/signup" method="POST">
+                <div class="form-group">
+                    <input type="text" placeholder="Choose Your Cursed Name" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" placeholder="Infernal Email" name="emailSignup" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="signupPassword" name="signupPassword" placeholder="Dark Secret" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('signupPassword')">
+                        👁️
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button type="submit">SACRIFICE</button>
+                </div>
+                <div class="switch-form" onclick="toggleForm()">
+                    Already cursed? Return to the shadows...
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function closePopup() {
+            document.getElementById('errorPopup').style.display = 'none';
+        }
+        
+        // Create floating ghost elements with various horror symbols
+        const horrorSymbols = ['☠', '⚰️', '🦇', '🕷️'];
+        for (let i = 0; i < 10; i++) {
+            const ghost = document.createElement('div');
+            ghost.className = 'ghost';
+            ghost.style.left = Math.random() * window.innerWidth + 'px';
+            ghost.style.top = Math.random() * window.innerHeight + 'px';
+            ghost.style.animationDelay = (i * 2) + 's';
+            ghost.innerHTML = horrorSymbols[Math.floor(Math.random() * horrorSymbols.length)];
+            document.body.appendChild(ghost);
+        }
+
+        // Create blood drip effects
+        for (let i = 0; i < 5; i++) {
+            const drip = document.createElement('div');
+            drip.className = 'blood-drip';
+            drip.style.left = (Math.random() * 100) + '%';
+            drip.style.animationDelay = (i * 0.5) + 's';
+            document.querySelector('.container').appendChild(drip);
+        }
+
+        // Form switch functionality with animation
+        let isLogin = true;
+        
+        const createBloodDrips = () => {
+            const container = document.querySelector('.container');
+            // Clear existing drips
+            const existingDrips = document.querySelectorAll('.blood-drip');
+            existingDrips.forEach(drip => drip.remove());
+
+            // Create new drips
+            for (let i = 0; i < 8; i++) {
+                const drip = document.createElement('div');
+                drip.className = 'blood-drip';
+                drip.style.left = (Math.random() * 100) + '%';
+                drip.style.animationDelay = (i * 0.8) + 's';
+                drip.style.width = (6 + Math.random() * 6) + 'px';
+                container.appendChild(drip);
+            }
+        };
+
+        // Initialize and periodically refresh blood drips
+        createBloodDrips();
+        setInterval(createBloodDrips, 5000);
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const button = input.nextElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = '👁️‍🗨️';
+            } else {
+                input.type = 'password';
+                button.textContent = '👁️';
+            }
+        }
+
+        function toggleForm() {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const container = document.querySelector('.container');
+            
+            container.classList.add('flip');
+            
+            setTimeout(() => {
+                if (loginForm.style.display !== 'none') {
+                    loginForm.style.display = 'none';
+                    signupForm.style.display = 'block';
+                } else {
+                    loginForm.style.display = 'block';
+                    signupForm.style.display = 'none';
+                }
+                container.classList.remove('flip');
+            }, 500);
+        }
+    </script>
+</body>
+</html>

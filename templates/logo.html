@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nosifer&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Darker+Grotesque:wght@700&display=swap');
+        .title {
+            font-family: 'Nosifer', cursive;
+            font-size: 5rem;
+            text-align: center;
+            color: #ff0000;
+            margin-top: 20%;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            animation: pulseTitle 3s ease-in-out infinite;
+        }
+
+        @keyframes pulseTitle {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 20px rgba(255, 0, 0, 0.5); }
+            50% { transform: scale(1.05); text-shadow: 0 0 30px rgba(255, 0, 0, 0.8); }
+        }
+
+        ::selection {
+            background-color: #660000;
+            color: #ffffff;
+            text-shadow: 0 0 8px #ff0000;
+        }
+    </style>
+    <title>Document</title>
+</head>
+<body>
+    <h1 class="title">Lost</h1>
+</body>
+</html>

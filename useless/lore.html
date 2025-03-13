@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: #000;
+            color: #8a8a8a;
+            font-family: 'Times New Roman', serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .lore-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .title {
+            font-size: 72px;
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 0 10px #ff0000;
+            opacity: 0;
+            animation: fadeIn 2s forwards;
+        }
+
+        .lore-section {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s;
+            margin: 40px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            position: relative;
+        }
+
+        .visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .quote {
+            font-style: italic;
+            color: #ff4444;
+            text-align: center;
+            font-size: 24px;
+            margin: 40px 0;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        .fog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="f"><feTurbulence type="fractalNoise" baseFrequency="0.01"/></filter><rect width="100%" height="100%" filter="url(%23f)"/></svg>');
+            opacity: 0.1;
+            pointer-events: none;
+            animation: fogMove 20s infinite linear;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        @keyframes fogMove {
+            from { transform: translateX(0); }
+            to { transform: translateX(100%); }
+        }
+
+        .eye {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #fff;
+            position: fixed;
+            opacity: 0;
+            transition: opacity 0.5s;
+            z-index: 100;
+        }
+
+        .eye::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: #000;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(calc(-50% + var(--moveX, 0px)), calc(-50% + var(--moveY, 0px)));
+        }
+
+        .eye.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="creepyBg"></div>
+    <div class="fog"></div>
+    
+    <div class="lore-container">
+        <h1 class="title">LOST</h1>
+        
+        <div class="lore-section">
+            <p>In the outskirts of a forgotten town stands a mansion, its weathered walls holding secrets darker than the shadows that dance across its facade. Time has claimed this place, draping it in nature's wild embrace, yet something more sinister lurks within its overgrown gardens.</p>
+        </div>
+
+        <div class="quote">"Let's explore just a little further..."</div>
+
+        <div class="lore-section">
+            <p>They were just children, seeking adventure on a summer afternoon. Five young souls, drawn to the mansion's decaying grandeur like moths to a flame. The garden's maze beckoned them with its mysterious allure - walls of ancient hedges reaching toward a darkening sky.</p>
+        </div>
+
+        <div class="lore-section">
+            <p>What began as innocent play turned to mounting dread as the maze seemed to shift around them. Passages that led one way would suddenly dead-end. Familiar paths twisted into unknown territories. As darkness fell, they realized their grave mistake - they were no longer alone in this living labyrinth.</p>
+        </div>
+
+        <div class="quote">"Did you hear that? Something's moving..."</div>
+
+        <div class="lore-section">
+            <p>It stalks them now through the endless corridors of green. A creature born from the mansion's dark history, feeding on fear and innocence. In this maze where time has lost all meaning, their only hope lies in solving its twisted puzzle before the monster claims them all.</p>
+        </div>
+
+        <div class="lore-section">
+            <p>Welcome to LOST - where every turn could lead to salvation... or something far worse. Will you help these children escape the maze? Or will you too become another lost soul in this garden of horrors?</p>
+        </div>
+    </div>
+
+    <script>
+        // Eye-tracking and creation logic
+        const maxEyes = 8;
+        let eyes = [];
+
+        function createEye() {
+            const eye = document.createElement('div');
+            eye.className = 'eye';
+            eye.style.left = Math.random() * 100 + '%';
+            eye.style.top = Math.random() * 100 + '%';
+            document.getElementById('creepyBg').appendChild(eye);
+            
+            setTimeout(() => {
+                eye.classList.add('visible');
+            }, 100);
+
+            return eye;
+        }
+
+        function removeEye(eye) {
+            eye.classList.remove('visible');
+            setTimeout(() => {
+                eye.remove();
+            }, 500);
+        }
+
+        function updateEyes() {
+            if (eyes.length > 0 && Math.random() < 0.3) {
+                const index = Math.floor(Math.random() * eyes.length);
+                removeEye(eyes[index]);
+                eyes.splice(index, 1);
+            }
+
+            if (eyes.length < maxEyes && Math.random() < 0.3) {
+                eyes.push(createEye());
+            }
+        }
+
+        function trackCursor(e) {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+
+            eyes.forEach(eye => {
+                const rect = eye.getBoundingClientRect();
+                const eyeCenterX = rect.left + rect.width / 2;
+                const eyeCenterY = rect.top + rect.height / 2;
+
+                const angle = Math.atan2(mouseY - eyeCenterY, mouseX - eyeCenterX);
+                const distance = Math.min(
+                    Math.sqrt(Math.pow(mouseX - eyeCenterX, 2) + Math.pow(mouseY - eyeCenterY, 2)) / 20,
+                    10
+                );
+
+                const moveX = Math.cos(angle) * distance;
+                const moveY = Math.sin(angle) * distance;
+                eye.style.setProperty('--moveX', `${moveX}px`);
+                eye.style.setProperty('--moveY', `${moveY}px`);
+            });
+        }
+
+        // Scroll animation
+        function checkScroll() {
+            const sections = document.querySelectorAll('.lore-section');
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                const isVisible = rect.top <= window.innerHeight * 0.8;
+                if (isVisible) {
+                    section.classList.add('visible');
+                }
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            for (let i = 0; i < maxEyes / 2; i++) {
+                eyes.push(createEye());
+            }
+
+            document.addEventListener('mousemove', trackCursor);
+            document.addEventListener('scroll', checkScroll);
+            setInterval(updateEyes, 2000);
+            checkScroll();
+        });
+    </script>
+</body>
+</html>
