@@ -549,8 +549,10 @@ const wallTexture = new Image();
 wallTexture.src = 'mossy.png';
 
 const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height / 2);
-skyGradient.addColorStop(0, '#404040');  
-skyGradient.addColorStop(1, '#A9A9A9'); 
+skyGradient.addColorStop(0, '#101010');  // Much darker top
+skyGradient.addColorStop(0.7, '#202020'); // Dark middle
+skyGradient.addColorStop(1, '#303030');   // Slightly lighter bottom
+
 
 function render() {
     movePlayer();
