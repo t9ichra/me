@@ -57,18 +57,16 @@ function initVolumeControls() {
     const pauseVolumeSlider = document.getElementById('pauseVolumeSlider');
     
     if (pauseVolumeSlider) {
-        // Set initial volume based on slider (50% is default)
+
         const initialVolume = pauseVolumeSlider.value / 100;
         ambientSound.volume = initialVolume * 0.3;
         rainSound.volume = initialVolume * 0.4;
         footstepSound.volume = initialVolume * 0.5;
         keySound.volume = initialVolume * 0.7;
         
-        // Add event listener for volume changes
         pauseVolumeSlider.addEventListener('input', function() {
-            const volume = this.value / 100; // Convert percentage to decimal (0-1)
+            const volume = this.value / 100; 
             
-            // Update all audio elements
             ambientSound.volume = volume * 0.3;
             rainSound.volume = volume * 0.4;
             footstepSound.volume = volume * 0.5;
@@ -81,48 +79,40 @@ function renderKeyCounter() {
     const keysCollected = keys.filter(key => key.collected).length;
     const totalKeys = keys.length;
     
-    // Check if all keys are collected
     if (keysCollected === totalKeys) {
-        // Create a glowing effect using time-based animation
+
+        // glow
         const glowIntensity = Math.sin(Date.now() * 0.005) * 0.3 + 0.7; // Value between 0.4 and 1.0
         
-        // Use a reddish color with varying alpha for the glow effect
         ctx.fillStyle = `rgba(255, 50, 50, ${glowIntensity})`;
         ctx.font = '24px Fantasy';
         
-        // Add a stronger shadow for the glow effect
         ctx.shadowColor = 'rgba(255, 0, 0, 0.8)';
         ctx.shadowBlur = 15;
         ctx.textAlign = 'right';
         
-        // Display only the gate open message
         ctx.fillText('THE GATE IS OPEN!', canvas.width - 20, 30);
     } else {
-        // If not all keys collected, show the key counter
+
         ctx.font = '20px Fantasy';
         ctx.fillStyle = 'white';
         ctx.textAlign = 'right';
         ctx.shadowColor = 'black';
         ctx.shadowBlur = 4;
         
-        // Draw keys counter
         ctx.fillText(`Keys: ${keysCollected}/${totalKeys}`, canvas.width - 20, 30);
     }
     
-    // Reset shadow for other rendering
     ctx.shadowBlur = 0;
 }
 
 function initAudio() {
-    // Set up ambient sound
     ambientSound.loop = true;
     ambientSound.volume = 0.3;
     
-    // Set up rain sound
     rainSound.loop = true;
     rainSound.volume = 0.4;
     
-    // Set up footstep sound
     footstepSound.volume = 0.5;
     
     keySound.volume = 0.7;
@@ -148,7 +138,6 @@ function playFootstepSound() {
     lastFootstepTime = currentTime;
     isFootstepPlaying = true;
     
-    // Clone the audio node to allow overlapping sounds
     const footstepInstance = footstepSound.cloneNode();
     footstepInstance.volume = 0.5;
     
@@ -413,7 +402,6 @@ function renderSprites() {
                 }
             }
         } else {
-            // Key rendering code
             for (let sx = leftBound; sx < rightBound; sx++) {
                 const textureX = ((sx - (screenX - spriteWidth / 2)) / spriteWidth) * sprite.image.width;
                 const columnDistance = distance * Math.cos(
@@ -550,13 +538,11 @@ function movePlayer() {
     if (cle['a']) playerAngle -= rotSpeed;
     if (cle['d']) playerAngle += rotSpeed;
     
-    // Play footstep sound if player moved
     if (playerMoved) {
         playFootstepSound();
     }
 }
 
-// Initialize audio system
 initAudio();
 
 const wallTexture = new Image();
