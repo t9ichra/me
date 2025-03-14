@@ -53,6 +53,29 @@ let isFootstepPlaying = false;
 let lastFootstepTime = 0;
 const FOOTSTEP_COOLDOWN = 400;
 
+function initVolumeControls() {
+    const pauseVolumeSlider = document.getElementById('pauseVolumeSlider');
+    
+    if (pauseVolumeSlider) {
+        // Set initial volume based on slider (50% is default)
+        const initialVolume = pauseVolumeSlider.value / 100;
+        ambientSound.volume = initialVolume * 0.3;
+        rainSound.volume = initialVolume * 0.4;
+        footstepSound.volume = initialVolume * 0.5;
+        keySound.volume = initialVolume * 0.7;
+        
+        // Add event listener for volume changes
+        pauseVolumeSlider.addEventListener('input', function() {
+            const volume = this.value / 100; // Convert percentage to decimal (0-1)
+            
+            // Update all audio elements
+            ambientSound.volume = volume * 0.3;
+            rainSound.volume = volume * 0.4;
+            footstepSound.volume = volume * 0.5;
+            keySound.volume = volume * 0.7;
+        });
+    }
+}
 
 function initAudio() {
     // Set up ambient sound
@@ -74,6 +97,7 @@ function initAudio() {
         console.log("Background sounds started");
     }, { once: true });
 
+    initVolumeControls();
 }
 
 function playKeySound() {
