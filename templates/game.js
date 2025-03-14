@@ -57,18 +57,15 @@ function initVolumeControls() {
     const pauseVolumeSlider = document.getElementById('pauseVolumeSlider');
     
     if (pauseVolumeSlider) {
-        // Set initial volume based on slider (50% is default)
         const initialVolume = pauseVolumeSlider.value / 100;
         ambientSound.volume = initialVolume * 0.3;
         rainSound.volume = initialVolume * 0.4;
         footstepSound.volume = initialVolume * 0.5;
         keySound.volume = initialVolume * 0.7;
         
-        // Add event listener for volume changes
         pauseVolumeSlider.addEventListener('input', function() {
-            const volume = this.value / 100; // Convert percentage to decimal (0-1)
+            const volume = this.value / 100; 
             
-            // Update all audio elements
             ambientSound.volume = volume * 0.3;
             rainSound.volume = volume * 0.4;
             footstepSound.volume = volume * 0.5;
