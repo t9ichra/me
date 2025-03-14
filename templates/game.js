@@ -77,6 +77,42 @@ function initVolumeControls() {
     }
 }
 
+function renderKeyCounter() {
+    const keysCollected = keys.filter(key => key.collected).length;
+    const totalKeys = keys.length;
+    
+    // Check if all keys are collected
+    if (keysCollected === totalKeys) {
+        // Create a glowing effect using time-based animation
+        const glowIntensity = Math.sin(Date.now() * 0.005) * 0.3 + 0.7; // Value between 0.4 and 1.0
+        
+        // Use a reddish color with varying alpha for the glow effect
+        ctx.fillStyle = `rgba(255, 50, 50, ${glowIntensity})`;
+        ctx.font = '24px Fantasy';
+        
+        // Add a stronger shadow for the glow effect
+        ctx.shadowColor = 'rgba(255, 0, 0, 0.8)';
+        ctx.shadowBlur = 15;
+        ctx.textAlign = 'right';
+        
+        // Display only the gate open message
+        ctx.fillText('THE GATE IS OPEN!', canvas.width - 20, 30);
+    } else {
+        // If not all keys collected, show the key counter
+        ctx.font = '20px Fantasy';
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'right';
+        ctx.shadowColor = 'black';
+        ctx.shadowBlur = 4;
+        
+        // Draw keys counter
+        ctx.fillText(`Keys: ${keysCollected}/${totalKeys}`, canvas.width - 20, 30);
+    }
+    
+    // Reset shadow for other rendering
+    ctx.shadowBlur = 0;
+}
+
 function initAudio() {
     // Set up ambient sound
     ambientSound.loop = true;
@@ -577,6 +613,7 @@ function render() {
         }
     }
     renderSprites();
+    renderKeyCounter();
     requestAnimationFrame(render);
 }
 
