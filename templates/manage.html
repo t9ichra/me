@@ -409,9 +409,200 @@
         button:hover:before {
             left: 100%;
         }
+
+        /* Cat header specific styles */
+.cat-header-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.cat-interface-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cat-left-buttons, .cat-right-buttons {
+    position: absolute;
+    display: none;
+    gap: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.cat-left-buttons {
+    right: 100%;
+    margin-right: 20px;
+}
+
+.cat-right-buttons {
+    left: 100%;
+    margin-left: 20px;
+}
+
+.cat-left-buttons.visible,
+.cat-right-buttons.visible {
+    display: flex;
+    opacity: 1;
+}
+
+.cat-header {
+    width: 120px;
+    height: 80px;
+    border-radius: 60% 60% 50% 50%;
+    background: radial-gradient(circle, #610c0c, #550000);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease;
+}
+
+.cat-header:hover {
+    box-shadow: 0 0 30px rgba(255, 0, 0, 1);
+}
+
+.cat-eye {
+    position: relative;
+    width: 80px;
+    height: 60px;
+    background: #cbbb5f;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cat-eyelid {
+    position: absolute;
+    width: 100%;
+    height: 50%;
+    background: #550000;
+    left: 0;
+    z-index: 2;
+    animation: cat-blink 4s infinite;
+}
+
+.cat-eyelid.cat-upper {
+    top: 0;
+    transform-origin: top;
+}
+
+.cat-eyelid.cat-lower {
+    bottom: 0;
+    transform-origin: bottom;
+}
+
+.cat-pupil {
+    position: absolute;
+    width: 8px;
+    height: 35px;
+    background: black;
+    border-radius: 50%;
+    transition: transform 0.1s ease-out;
+    z-index: 1;
+}
+
+.cat-pupil::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        circle at center,
+        #000000 60%,
+        #440000 80%,
+        #000000 100%
+    );
+    border-radius: 50%;
+}
+
+.cat-btn {
+    background: linear-gradient(90deg, #ff0000, #550000);
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    color: white;
+    cursor: pointer;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+    animation: cat-fadeInScale 0.5s ease forwards;
+}
+
+.cat-btn:hover {
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.9);
+}
+
+@keyframes cat-blink {
+    0%, 95%, 100% {
+        transform: scaleY(0);
+    }
+    97.5% {
+        transform: scaleY(1);
+    }
+}
+
+@keyframes cat-fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+a:hover {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
     </style>
 </head>
 <body>
+
+    <div class="cat-header-container">
+        <div class="cat-interface-container">
+            <div class="cat-left-buttons">
+              
+                <button class="cat-btn"><a href="{{ url_for('lobby') }}">Lobby</a></button>
+                <button class="cat-btn"><a href="{{ url_for('game') }}">Start Game</a></button>
+             
+            </div>
+            <div class="cat-header" onclick="toggleCatButtons()">
+                <div class="cat-eye">
+                    <div class="cat-eyelid cat-upper"></div>
+                    <div class="cat-eyelid cat-lower"></div>
+                    <div class="cat-pupil"></div>
+                </div>
+            </div>
+            <div class="cat-right-buttons">
+                <button class="cat-btn"><a href="{{ url_for('lobby') }}">Lobby</a></button>
+                <button class="cat-btn"><a href="{{ url_for('game') }}">Start Game</a></button>
+            </div>
+        </div>
+    </div>
+
     <div class="background"></div>
     <div class="fog-layer"></div>
     <div class="fog-layer"></div>
@@ -716,7 +907,64 @@ document.getElementById('modifyBtn').addEventListener('click', function(e) {
 
     </script>
 
-
+<script>
+    function toggleCatButtons() {
+        const leftButtons = document.querySelector('.cat-left-buttons');
+        const rightButtons = document.querySelector('.cat-right-buttons');
+        leftButtons.classList.toggle('visible');
+        rightButtons.classList.toggle('visible');
+        
+        const buttons = document.querySelectorAll('.cat-btn');
+        buttons.forEach((btn, index) => {
+            btn.style.animationDelay = `${index * 0.1}s`;
+        });
+    }
+    
+    // Eye tracking function
+    document.addEventListener('mousemove', (event) => {
+        const header = document.querySelector('.cat-header');
+        const pupil = document.querySelector('.cat-pupil');
+        if (header && pupil) {
+            const rect = header.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const dx = event.clientX - centerX;
+            const dy = event.clientY - centerY;
+            
+            const maxDistance = 15;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const ratio = Math.min(maxDistance / distance, 1);
+    
+            const offsetX = dx * ratio * 0.3;
+            const offsetY = dy * ratio * 0.3;
+    
+            pupil.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+        }
+    });
+    
+    // Add random additional blinks
+    function addCatRandomBlink() {
+        const eyelids = document.querySelectorAll('.cat-eyelid');
+        const randomDelay = Math.random() * 5000 + 2000; // Random delay between 2-7 seconds
+        
+        setTimeout(() => {
+            eyelids.forEach(eyelid => {
+                eyelid.style.animation = 'none';
+                eyelid.offsetHeight; // Trigger reflow
+                eyelid.style.animation = 'cat-blink 4s infinite';
+            });
+            addCatRandomBlink();
+        }, randomDelay);
+    }
+    
+    // Add this to your existing window.onload
+    const originalOnload = window.onload;
+    window.onload = function() {
+        if (originalOnload) originalOnload();
+        addCatRandomBlink();
+    };
+</script>
 
 </body>
 </html>
