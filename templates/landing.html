@@ -240,6 +240,16 @@
             }
         }
 
+        a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+        
+        a:hover {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
     </style>
 </head>
 <body>
@@ -247,10 +257,8 @@
     <div class="header-container">
         <div class="interface-container">
             <div class="left-buttons">
-                <button><a href="{{ url_for('landing') }}">Home (Landing)</a></button>
-                <button><a href="{{ url_for('lobby') }}">Go to Lobby</a></button>
-                <button><a href="{{ url_for('lore') }}">Read the Lore</a></button>
-                <button><a href="{{ url_for('game') }}">Start Game</a></button>
+                <button><a href="{{ url_for('landing') }}">Home</a></button>
+                <button><a href="{{ url_for('lore') }}">The Lore</a></button>
             </div>
             <div class="header" onclick="toggleButtons()">
                 <div class="eye">
@@ -260,8 +268,8 @@
                 </div>
             </div>
             <div class="right-buttons">
-                <button>Option 4</button>
-                <button>Option 5</button>
+                <button><a href="{{ url_for('lobby') }}">Lobby</a></button>
+                <button><a href="{{ url_for('game') }}">Start Game</a></button>
             </div>
         </div>
     </div>
