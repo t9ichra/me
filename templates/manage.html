@@ -410,7 +410,6 @@
             left: 100%;
         }
 
-        /* Cat header specific styles */
 .cat-header-container {
     position: fixed;
     top: 0;
@@ -584,10 +583,7 @@ a:hover {
     <div class="cat-header-container">
         <div class="cat-interface-container">
             <div class="cat-left-buttons">
-              
-                <button class="cat-btn"><a href="{{ url_for('lobby') }}">Lobby</a></button>
-                <button class="cat-btn"><a href="{{ url_for('game') }}">Start Game</a></button>
-             
+            
             </div>
             <div class="cat-header" onclick="toggleCatButtons()">
                 <div class="cat-eye">
@@ -597,8 +593,7 @@ a:hover {
                 </div>
             </div>
             <div class="cat-right-buttons">
-                <button class="cat-btn"><a href="{{ url_for('lobby') }}">Lobby</a></button>
-                <button class="cat-btn"><a href="{{ url_for('game') }}">Start Game</a></button>
+ 
             </div>
         </div>
     </div>
@@ -613,43 +608,50 @@ a:hover {
     
     <div class="container">
         <h1>Change info</h1>
-        <form id="creepyForm">
+        <form id="creepyForm" method="POST" action="/update_account">
+
+            <input type="hidden" name="current_username" value="{{ user_info.username }}">
+            
             <div class="form-row">
                 <div class="form-column">
                     <div class="form-group">
-                        <input type="text" id="username" placeholder="Username" required>
+                        <input type="text" id="username" name="username" value="{{ user_info.username }}" placeholder="Username" required>
                     </div>
                     <div class="form-group">
-                        <input type="email" id="email" placeholder="Email" required>
+                        <input type="email" id="email" name="email" value="{{ user_info.email }}" placeholder="Email" required>
                     </div>
                 </div>
                 <div class="form-column">
                     <div class="form-group">
-                        <input type="password" id="password" placeholder="Password" required>
+                        <input type="password" id="password" name="password" placeholder="Password" required>
                     </div>
                     <div class="form-group">
-                        <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
                     </div>
                 </div>
             </div>
-
+        
             <div style="display: flex; gap: 20px;">
                 <button type="submit" id="modifyBtn">Modify</button>
-                <button type="button" id="deleteBtn">Delete Account</button>
+                <button type="button" id="deleteBtn" onclick="confirmDelete()">Delete Account</button>
             </div>
-
         </form>
     </div>
-
+    
     <div id="deleteConfirmPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 100; justify-content: center; align-items: center;">
         <div style="width: 300px; background-color: rgba(20, 20, 20, 0.9); padding: 30px; border: 1px solid #8B0000; box-shadow: 0 0 20px #8B0000; text-align: center;">
             <h3 style="margin-bottom: 20px; color: #fff; text-shadow: 0 0 5px #8B0000;">Are you sure you want to delete your account?</h3>
             <div style="display: flex; gap: 15px; justify-content: center;">
-                <button id="confirmDeleteBtn" style="flex: 1; background-color: #8B0000;">Yes</button>
-                <button id="cancelDeleteBtn" style="flex: 1; background-color: #333;">No</button>
+
+                <form action="/delete_account" method="post">
+                <button type="submit" id="confirmDeleteBtn" style="flex: 1; background-color: #8B0000;" onclick="deleteAccount()">Yes</button>
+                </form>
+
+                <button id="cancelDeleteBtn" style="flex: 1; background-color: #333;" onclick="cancelDelete()">No</button>
             </div>
         </div>
     </div>
+    
     <script>
 
     function createParticles() {
@@ -860,20 +862,17 @@ document.getElementById('deleteBtn').addEventListener('click', function() {
     popup.style.display = 'flex';
 });
 
-// Confirm delete
 document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-    // Add your deletion logic here
     alert('Account deleted successfully');
-    // Hide the popup
     document.getElementById('deleteConfirmPopup').style.display = 'none';
 });
 
-// Cancel delete
+
 document.getElementById('cancelDeleteBtn').addEventListener('click', function() {
-    // Hide the popup
     document.getElementById('deleteConfirmPopup').style.display = 'none';
 });
-// Prevent form submission when clicking Modify button
+
+
 document.getElementById('modifyBtn').addEventListener('click', function(e) {
     e.preventDefault();
     
@@ -894,17 +893,12 @@ document.getElementById('modifyBtn').addEventListener('click', function(e) {
     
     this.innerText = 'Welcome...';
     
-    const body = document.body;
-    body.style.animation = 'flicker 0.1s 3';
+    const form = document.getElementById('creepyForm');
     
     setTimeout(() => {
-        document.querySelector('.container').style.opacity = '0';
-        setTimeout(() => {
-            alert('Your soul is ours now...');
-        }, 1000);
-    }, 1500);
+        form.submit(); 
+    }, 500);
 });
-
     </script>
 
 <script>
@@ -920,7 +914,6 @@ document.getElementById('modifyBtn').addEventListener('click', function(e) {
         });
     }
     
-    // Eye tracking function
     document.addEventListener('mousemove', (event) => {
         const header = document.querySelector('.cat-header');
         const pupil = document.querySelector('.cat-pupil');
@@ -943,22 +936,21 @@ document.getElementById('modifyBtn').addEventListener('click', function(e) {
         }
     });
     
-    // Add random additional blinks
     function addCatRandomBlink() {
         const eyelids = document.querySelectorAll('.cat-eyelid');
-        const randomDelay = Math.random() * 5000 + 2000; // Random delay between 2-7 seconds
+        const randomDelay = Math.random() * 5000 + 2000; 
         
         setTimeout(() => {
             eyelids.forEach(eyelid => {
                 eyelid.style.animation = 'none';
-                eyelid.offsetHeight; // Trigger reflow
+                eyelid.offsetHeight; 
                 eyelid.style.animation = 'cat-blink 4s infinite';
             });
             addCatRandomBlink();
         }, randomDelay);
     }
     
-    // Add this to your existing window.onload
+    
     const originalOnload = window.onload;
     window.onload = function() {
         if (originalOnload) originalOnload();
