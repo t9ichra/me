@@ -49,6 +49,8 @@ let ambientSound = new Audio('ambient.mp3');
 let rainSound = new Audio('rain.mp3');
 let footstepSound = new Audio('footstep.mp3');
 let keySound = new Audio('keys.mp3');
+let screamSound = new Audio('scream.mp3');
+let crySound = new Audio('cry.mp3');
 let isFootstepPlaying = false;
 let lastFootstepTime = 0;
 const FOOTSTEP_COOLDOWN = 400;
@@ -63,6 +65,8 @@ function initVolumeControls() {
         rainSound.volume = initialVolume * 0.4;
         footstepSound.volume = initialVolume * 0.5;
         keySound.volume = initialVolume * 0.7;
+        screamSound.volume = initialVolume * 0.6;
+        crySound.volume = initialVolume * 0.5;
         
         pauseVolumeSlider.addEventListener('input', function() {
             const volume = this.value / 100; 
@@ -71,6 +75,8 @@ function initVolumeControls() {
             rainSound.volume = volume * 0.4;
             footstepSound.volume = volume * 0.5;
             keySound.volume = volume * 0.7;
+            screamSound.volume = volume * 0.6;
+            crySound.volume = volume * 0.5;
         });
     }
 }
@@ -81,8 +87,7 @@ function renderKeyCounter() {
     
     if (keysCollected === totalKeys) {
 
-        // glow
-        const glowIntensity = Math.sin(Date.now() * 0.005) * 0.3 + 0.7; // Value between 0.4 and 1.0
+        const glowIntensity = Math.sin(Date.now() * 0.005) * 0.3 + 0.7; 
         
         ctx.fillStyle = `rgba(255, 50, 50, ${glowIntensity})`;
         ctx.font = '24px Fantasy';
@@ -117,6 +122,9 @@ function initAudio() {
     
     keySound.volume = 0.7;
     
+    screamSound.volume = 0.6;
+    crySound.volume = 0.5;
+
     document.addEventListener('click', () => {
         ambientSound.play().catch(e => console.log("Ambient audio play failed:", e));
         rainSound.play().catch(e => console.log("Rain audio play failed:", e));
@@ -124,6 +132,18 @@ function initAudio() {
     }, { once: true });
 
     initVolumeControls();
+}
+
+function playRandomHorrorSounds() {
+    if (Math.random() < 0.0005) {
+        if (Math.random() < 0.5) {
+            const screamInstance = screamSound.cloneNode();
+            screamInstance.play().catch(e => console.log("Scream sound play failed:", e));
+        } else {
+            const cryInstance = crySound.cloneNode();
+            cryInstance.play().catch(e => console.log("Cry sound play failed:", e));
+        }
+    }
 }
 
 function playKeySound() {
@@ -549,10 +569,9 @@ const wallTexture = new Image();
 wallTexture.src = 'mossy.png';
 
 const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height / 2);
-skyGradient.addColorStop(0, '#101010');  // Much darker top
-skyGradient.addColorStop(0.7, '#202020'); // Dark middle
-skyGradient.addColorStop(1, '#303030');   // Slightly lighter bottom
-
+skyGradient.addColorStop(0, '#808080 '); 
+skyGradient.addColorStop(0.7, '#c0c0c0'); 
+skyGradient.addColorStop(1, '#dcdcdc');   
 
 function render() {
     movePlayer();
@@ -565,6 +584,7 @@ function render() {
 
     addKeysToMap();
     checkKeyCollection();
+    playRandomHorrorSounds();
 
     generateRain();
     animateRain();
