@@ -576,6 +576,74 @@ a {
 a:hover {
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
+
+.error-message {
+    margin-bottom: 20px;
+    padding: 12px 15px;
+    background-color: rgba(139, 0, 0, 0.9);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    position: relative;
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(139, 0, 0, 0.8);
+}
+
+.error-x {
+    font-size: 18px;
+    margin-right: 10px;
+    color: #fff;
+}
+
+.error-text {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+    flex-grow: 1;
+}
+
+.error-close {
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 5px;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.error-close:hover {
+    opacity: 1;
+}
+
+
+.success-message {
+    margin-bottom: 20px;
+    padding: 12px 15px;
+    background-color: rgba(5, 75, 5, 0.9);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    position: relative;
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(0, 81, 0, 0.8);
+}
+
+.success-text {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+    flex-grow: 1;
+}
+
+.success-close {
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0 5px;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.success-close:hover {
+    opacity: 1;
+}
+
     </style>
 </head>
 <body>
@@ -608,6 +676,19 @@ a:hover {
     
     <div class="container">
         <h1>Change info</h1>
+        {% if error %}
+        <div class="error-message">
+            <div class="error-text">{{ error }}</div>
+            <div class="error-close" onclick="this.parentElement.style.display='none'">✕</div>
+        </div>
+        {% endif %}
+        
+        {% if success %}
+        <div class="success-message">
+            <div class="success-text">{{ success }}</div>
+            <div class="success-close" onclick="this.parentElement.style.display='none'">✕</div>
+        </div>
+        {% endif %}
         <form id="creepyForm" method="POST" action="/update_account">
 
             <input type="hidden" name="current_username" value="{{ user_info.username }}">
@@ -857,7 +938,6 @@ window.onload = function() {
 };
 
 document.getElementById('deleteBtn').addEventListener('click', function() {
-    // Show the custom popup
     const popup = document.getElementById('deleteConfirmPopup');
     popup.style.display = 'flex';
 });
