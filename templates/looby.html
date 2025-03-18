@@ -690,7 +690,6 @@
             <button class="modal-close" id="closeCreateModal">✕</button>
             <h2>Create New Game</h2>
             <form class="modal-form">
-                <input type="text" placeholder="Game name" required>
                 <div class="radio-group">
                     <label class="radio-option">
                         <input type="radio" name="gameType" value="public" checked>
@@ -817,7 +816,6 @@
         }
 
         function setupModals() {
-            // Join Game modal
             const joinGameBtn = document.getElementById('joinGameBtn');
             const joinGameModal = document.getElementById('joinGameModal');
             const closeJoinModal = document.getElementById('closeJoinModal');
@@ -830,7 +828,6 @@
                 joinGameModal.classList.remove('active');
             });
 
-            // Create Game modal
             const createGameBtn = document.getElementById('createGameBtn');
             const createGameModal = document.getElementById('createGameModal');
             const closeCreateModal = document.getElementById('closeCreateModal');
@@ -843,7 +840,6 @@
                 createGameModal.classList.remove('active');
             });
 
-            // Close modals when clicking outside
             window.addEventListener('click', (e) => {
                 if (e.target === joinGameModal) {
                     joinGameModal.classList.remove('active');
@@ -853,12 +849,10 @@
                 }
             });
 
-            // Form submissions
             document.querySelectorAll('.modal-form').forEach(form => {
                 form.addEventListener('submit', (e) => {
                     e.preventDefault();
-                    // Here you would handle the form submission
-                    // For now, just close the modal
+                   
                     joinGameModal.classList.remove('active');
                     createGameModal.classList.remove('active');
                 });
@@ -866,6 +860,65 @@
         }
 
         addRandomBlink();
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("DOM fully loaded and parsed");
+            const createGameForm = document.querySelector("#createGameModal .modal-form");
+            const createGameModal = document.getElementById("createGameModal");
+            
+            if (createGameForm) {
+                createGameForm.addEventListener("submit", async function (event) {
+                    event.preventDefault();
+                    console.log("Create Game button clicked!");
+                    
+                    const gameTypeRadios = document.querySelectorAll('input[name="gameType"]');
+                    let gameType = "public"; 
+                    
+                    for (const radio of gameTypeRadios) {
+                        if (radio.checked) {
+                            gameType = radio.value;
+                            break;
+                        }
+                    }
+                    
+                    console.log(`Selected game type: ${gameType}`);
+                    
+                  
+                    const apiUrl = `/new_game/${gameType}`;
+                    
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Accept": "application/json"
+                            }
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        
+                        const gameId = await response.text();
+                        console.log(`Game ID: ${gameId}`);
+                        
+                        alert(`Game Created! ID: ${gameId}`);
+                        createGameModal.classList.remove('active'); 
+                        
+              
+                        window.location.href = `http://127.0.0.1:8000/${gameType}/${gameId}/player1`;
+                        
+                    } catch (error) {
+                        console.error("Error creating game:", error);
+                        alert("Failed to create game. Please try again. Error: " + error.message);
+                    }
+                });
+            } else {
+                console.error("Create game form element not found!");
+            }
+        });
     </script>
 </body>
 </html>
