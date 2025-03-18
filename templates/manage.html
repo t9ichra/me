@@ -644,6 +644,22 @@ a:hover {
     opacity: 1;
 }
 
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #888;
+    user-select: none;
+}
+
+.password-toggle:hover {
+    color: #8B0000;
+    text-shadow: 0 0 5px rgba(139, 0, 0, 0.5);
+}
+
     </style>
 </head>
 <body>
@@ -704,10 +720,16 @@ a:hover {
                 </div>
                 <div class="form-column">
                     <div class="form-group">
-                        <input type="password" id="password" name="password" placeholder="Password" required>
+                        <div style="position: relative;">
+                            <input type="password" id="password" name="password" placeholder="Password" >
+                            <span class="password-toggle" onclick="togglePasswordVisibility('password')">👁️</span>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
+                        <div style="position: relative;">
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password">
+                            <span class="password-toggle" onclick="togglePasswordVisibility('confirmPassword')">👁️</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -952,33 +974,33 @@ document.getElementById('cancelDeleteBtn').addEventListener('click', function() 
     document.getElementById('deleteConfirmPopup').style.display = 'none';
 });
 
-
-document.getElementById('modifyBtn').addEventListener('click', function(e) {
-    e.preventDefault();
-    
+document.getElementById('creepyForm').addEventListener('submit', function(e) {
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
     
     if (password !== confirmPassword) {
-        const inputs = document.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.style.animation = 'flicker 0.5s';
-            setTimeout(() => {
-                input.style.animation = '';
-            }, 500);
-        });
+        e.preventDefault();
+        // Create error message
+        const existingError = document.querySelector('.error-message');
+        if (existingError) existingError.remove();
+        
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.innerHTML = `
+            <div class="error-text">The cursed passwords do not align. Try again.</div>
+            <div class="error-close" onclick="this.parentElement.style.display='none'">✕</div>
+        `;
+        
+        this.insertBefore(errorDiv, this.firstChild);
+        
+        // Visual feedback
+        document.getElementById('password').style.borderBottomColor = '#8B0000';
+        document.getElementById('confirmPassword').style.borderBottomColor = '#8B0000';
         
         return false;
     }
-    
-    this.innerText = 'Welcome...';
-    
-    const form = document.getElementById('creepyForm');
-    
-    setTimeout(() => {
-        form.submit(); 
-    }, 500);
 });
+
     </script>
 
 <script>
@@ -1036,6 +1058,17 @@ document.getElementById('modifyBtn').addEventListener('click', function(e) {
         if (originalOnload) originalOnload();
         addCatRandomBlink();
     };
+
+
+    function togglePasswordVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+        } else {
+            input.type = "password";
+        }
+    }
+
 </script>
 
 </body>

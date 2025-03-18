@@ -109,6 +109,9 @@ async def update_account(
     confirmPassword: str = Form(...),
     current_username: str = Depends(get_user_from_session)
 ):
+        
+    user_info = fetch_user_info(current_username)
+
     if password != confirmPassword:
         return templates.TemplateResponse(
             "manage.html", 
@@ -132,21 +135,22 @@ async def update_account(
         response.set_cookie(key="success_message", value=success_data, max_age=30)
         
         return response
-    except pymysql.err.IntegrityError as e:
-        error_str = str(e)
-        if "Duplicate entry" in error_str:
-            if "email" in error_str:
-                error_msg = "This infernal email has already been sacrificed. Try another."
-            else:
-                error_msg = "This unholy username has already been claimed. Choose another."
-        else:
-            error_msg = "Dark forces prevented your changes. Try again."
-            
+    
+    except Exception as e:
+        error_msg = "A supernatural error occurred. Try again if you dare."
+        if isinstance(e, pymysql.err.IntegrityError):
+            error_str = str(e)
+            if "Duplicate entry" in error_str:
+                if "email" in error_str:
+                    error_msg = "This infernal email has already been sacrificed. Try another."
+                else:
+                    error_msg = "This unholy username has already been claimed. Choose another."
+        
         return templates.TemplateResponse(
             "manage.html", 
             {
                 "request": request, 
-                "user_info": fetch_user_info(current_username), 
+                "user_info": user_info, 
                 "error": error_msg
             }
         )
