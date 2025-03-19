@@ -250,10 +250,8 @@ async def lobby(request: Request):
 
 @app.get("/lore", response_class=HTMLResponse)
 async def lore(request: Request):
-    redirect_response = require_auth(request)
-    if redirect_response:
-        return redirect_response
-    return templates.TemplateResponse("lore.html", {"request": request})
+    username = get_optional_user(request.cookies.get("user_session"))
+    return templates.TemplateResponse("lore.html", {"request": request, "username": username})
 
 @app.get("/game", response_class=HTMLResponse)
 async def game(request: Request):
@@ -390,6 +388,12 @@ async def delete_account(request: Request):
             "manage.html", 
             {"request": request, "user_info": fetch_user_info(username), "error": str(e)}
         )
+
+@app.get("/disconnect")
+async def disconnect():
+    response = RedirectResponse(url="/", status_code=303)
+    response.delete_cookie(key="user_session")
+    return response
 
 # Main entry point to run the application
 if __name__ == "__main__":

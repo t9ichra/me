@@ -449,6 +449,10 @@
     margin-left: 20px;
 }
 
+.cat-right-buttons .button {
+    display: inline-block;
+    text-decoration: none;
+}
 .cat-left-buttons.visible,
 .cat-right-buttons.visible {
     display: flex;
@@ -532,7 +536,9 @@
     border-radius: 50%;
 }
 
-.cat-btn {
+.cat-left-buttons button, 
+.cat-right-buttons button,
+.cat-right-buttons .button {
     background: linear-gradient(90deg, #ff0000, #550000);
     border: none;
     border-radius: 10px;
@@ -541,6 +547,7 @@
     cursor: pointer;
     text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
     animation: cat-fadeInScale 0.5s ease forwards;
+    width: auto;
 }
 
 .cat-btn:hover {
@@ -660,6 +667,12 @@ a:hover {
     text-shadow: 0 0 5px rgba(139, 0, 0, 0.5);
 }
 
+::selection {
+    background-color: #660000;
+    color: #ffffff;
+    text-shadow: 0 0 8px #ff0000;
+}
+
     </style>
 </head>
 <body>
@@ -667,7 +680,8 @@ a:hover {
     <div class="cat-header-container">
         <div class="cat-interface-container">
             <div class="cat-left-buttons">
-            
+                <button><a href="/">Home</a></button>
+                <button><a href="/lore">The Lore</a></button>
             </div>
             <div class="cat-header" onclick="toggleCatButtons()">
                 <div class="cat-eye">
@@ -677,7 +691,8 @@ a:hover {
                 </div>
             </div>
             <div class="cat-right-buttons">
- 
+                <button><a href="/lobby">Lobbies</a></button>
+                <a href="/disconnect" class="button">Disconnect</a>
             </div>
         </div>
     </div>
