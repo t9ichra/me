@@ -67,11 +67,10 @@ def fetch_user_info(username: str):
             return cursor.fetchone()
     finally:
         connection.close()
-
-def update_user_info(username: str, new_username: str, email: str, password: str):
-    hashed_password = pwd_context.hash(password)
+def update_user_info(username: str, new_username: str, email: str, password: str = None):
     connection = get_db_connection()
     try:
+        # Check for duplicate username if it's changed
         if username != new_username:
             with connection.cursor() as cursor:
                 cursor.execute("SELECT * FROM user WHERE username = %s", (new_username,))
@@ -79,11 +78,22 @@ def update_user_info(username: str, new_username: str, email: str, password: str
                     raise pymysql.err.IntegrityError("Duplicate entry for username")
         
         with connection.cursor() as cursor:
-            cursor.execute("""
-                UPDATE user 
-                SET username = %s, email = %s, password = %s 
-                WHERE username = %s
-            """, (new_username, email, hashed_password, username))
+            if password:
+                # Update including the password
+                hashed_password = pwd_context.hash(password)
+                cursor.execute("""
+                    UPDATE user 
+                    SET username = %s, email = %s, password = %s 
+                    WHERE username = %s
+                """, (new_username, email, hashed_password, username))
+            else:
+                # Update without changing the password
+                cursor.execute("""
+                    UPDATE user 
+                    SET username = %s, email = %s 
+                    WHERE username = %s
+                """, (new_username, email, username))
+            
             connection.commit()
     finally:
         connection.close()
@@ -135,31 +145,46 @@ async def get_form(request: Request, error_message: str = None):
 async def login(request: Request, email: str = Form(...), password: str = Form(...)):
     connection = get_db_connection()
     cursor = connection.cursor()
-    
+
     try:
         cursor.execute("SELECT * FROM user WHERE email = %s", (email,))
         db_user = cursor.fetchone()
-        
+
         if db_user is None:
             return templates.TemplateResponse(
-                "auth.html", 
+                "auth.html",
                 {"request": request, "error_message": "Your soul is not yet bound to our realm. Check your email or sign up."}
             )
 
+        if db_user['isBanned'] == '1':
+            cursor.execute("SELECT ban_time, unban_time, reason FROM ban WHERE id_user = %s", (db_user['id_user'],))
+            ban_info = cursor.fetchone()
+
+            if ban_info:
+                return templates.TemplateResponse(
+                    "auth.html",
+                    {
+                        "request": request,
+                        "error_message": f"You have been banished since {ban_info['ban_time']}. "
+                                         f"You shall be free on {ban_info['unban_time']}. "
+                                         f"Reason: {ban_info['reason']}"
+                    }
+                )
+
         if not pwd_context.verify(password, db_user['password']):
             return templates.TemplateResponse(
-                "auth.html", 
+                "auth.html",
                 {"request": request, "error_message": "Your dark secret is incorrect. The shadows reject your entry."}
             )
-        
+
         session_id = str(uuid.uuid4())
         session_data = {
             "session_id": session_id,
             "username": db_user['username']
         }
-        
+
         session_json = json.dumps(session_data)
-        
+
         response = RedirectResponse(url="/lobby", status_code=303)
         response.set_cookie(key="user_session", value=session_json, httponly=True)
 
@@ -168,12 +193,13 @@ async def login(request: Request, email: str = Form(...), password: str = Form(.
     except Exception as e:
         print(f"Login error: {str(e)}")
         return templates.TemplateResponse(
-            "auth.html", 
+            "auth.html",
             {"request": request, "error_message": "A dark force prevents your entry. Try again later."}
         )
     finally:
         cursor.close()
         connection.close()
+
 
 @app.post("/signup")
 async def signup(
@@ -304,14 +330,13 @@ async def get_manage_page(request: Request):
         return templates.TemplateResponse("manage.html", context)
     else:
         return RedirectResponse(url="/", status_code=303)
-
 @app.post("/update_account")
 async def update_account(
     request: Request, 
     username: str = Form(...),
     email: str = Form(...), 
-    password: str = Form(...), 
-    confirmPassword: str = Form(...)
+    password: str = Form(""), 
+    confirmPassword: str = Form("")
 ):
     redirect_response = require_auth(request)
     if redirect_response:
@@ -323,41 +348,45 @@ async def update_account(
     
     user_info = fetch_user_info(current_username)
 
-    if password != confirmPassword:
-        return templates.TemplateResponse(
-            "manage.html", 
-            {
-                "request": request, 
-                "user_info": user_info, 
-                "error": "The cursed passwords do not align. Try again."
-            }
-        )
+    # Handle password update only if both fields are filled
+    if password and confirmPassword:
+        if password != confirmPassword:
+            return templates.TemplateResponse(
+                "manage.html", 
+                {
+                    "request": request, 
+                    "user_info": user_info, 
+                    "error": "The passwords do not match. Please try again."
+                }
+            )
+    else:
+        password = None  # Don't update password if left empty
     
     try:
         update_user_info(current_username, username, email, password)
         
         response = RedirectResponse(url="/manage", status_code=303)
         
-        # Update session with new username
+        # Update session if username changes
         session_data["username"] = username
         session_json = json.dumps(session_data)
         response.set_cookie(key="user_session", value=session_json)
         
-        success_message = "Your unholy account has been successfully updated!"
+        success_message = "Your account has been successfully updated!"
         success_data = json.dumps({"success": success_message})
         response.set_cookie(key="success_message", value=success_data, max_age=30)
         
         return response
     
     except Exception as e:
-        error_msg = "A supernatural error occurred. Try again if you dare."
+        error_msg = "An error occurred. Please try again."
         if isinstance(e, pymysql.err.IntegrityError):
             error_str = str(e)
             if "Duplicate entry" in error_str:
                 if "email" in error_str:
-                    error_msg = "This infernal email has already been sacrificed. Try another."
+                    error_msg = "This email is already in use. Please try another."
                 else:
-                    error_msg = "This unholy username has already been claimed. Choose another."
+                    error_msg = "This username is already taken. Please choose another."
         
         return templates.TemplateResponse(
             "manage.html", 
