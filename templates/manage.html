@@ -9,7 +9,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Courier New', monospace;
+            font-family: 'Darker Grotesque', sans-serif;
         }
 
         body {
@@ -385,7 +385,6 @@
             letter-spacing: 2px;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-transform: uppercase;
             position: relative;
             overflow: hidden;
             margin-top: 15px;
@@ -542,12 +541,29 @@
     background: linear-gradient(90deg, #ff0000, #550000);
     border: none;
     border-radius: 10px;
-    padding: 10px 20px;
+    padding: 10px 5px;
     color: white;
     cursor: pointer;
     text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
     animation: cat-fadeInScale 0.5s ease forwards;
-    width: auto;
+    width: 120px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none; /* Important for the a.button element */
+    font-size: 16px;
+    font-family: 'Darker Grotesque', sans-serif;
+}
+
+.cat-left-buttons button a, 
+.cat-right-buttons button a,
+.cat-right-buttons .button {
+    color: white;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    text-align: center;
 }
 
 .cat-btn:hover {
@@ -603,7 +619,7 @@ a:hover {
 }
 
 .error-text {
-    font-family: 'Courier New', monospace;
+    font-family: 'Darker Grotesque', sans-serif;
     letter-spacing: 1px;
     flex-grow: 1;
 }
@@ -634,9 +650,25 @@ a:hover {
 }
 
 .success-text {
-    font-family: 'Courier New', monospace;
+    font-family: 'Darker Grotesque', sans-serif;
     letter-spacing: 1px;
     flex-grow: 1;
+}
+
+/* Fix the Yes/No buttons in delete confirmation */
+#confirmDeleteBtn, 
+#cancelDeleteBtn {
+    width: 80px; /* Same width for both */
+    height: 45px; /* Same height */
+    font-size: 16px;
+    margin: 0 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#confirmDeleteBtn, #cancelDeleteBtn {
+    flex: none;
 }
 
 .success-close {
@@ -692,7 +724,7 @@ a:hover {
             </div>
             <div class="cat-right-buttons">
                 <button><a href="/lobby">Lobbies</a></button>
-                <a href="/disconnect" class="button">Disconnect</a>
+                <button><a href="/disconnect">Disconnect</a></button>
             </div>
         </div>
     </div>

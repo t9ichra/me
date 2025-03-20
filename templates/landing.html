@@ -250,11 +250,232 @@
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
 
+        .book-header-container {
+            position: fixed;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            pointer-events: none;
+        }
+    
+        .book {
+            position: relative;
+            width: 120px;  /* Medium size */
+            height: 160px;
+            transform-style: preserve-3d;
+            transform: rotateX(10deg);
+            transition: transform 0.8s ease;
+            cursor: pointer;
+            pointer-events: auto;
+            animation: floatBook 3s ease-in-out infinite;
+            perspective: 1000px;
+        }
+    
+        @keyframes floatBook {
+            0%, 100% { transform: rotateX(10deg) translateY(0); }
+            50% { transform: rotateX(10deg) translateY(-10px); }
+        }
+    
+        .book:hover {
+            transform: rotateX(10deg) rotateY(0deg);
+            animation-play-state: paused;
+        }
+    
+        .book-cover {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-origin: left;
+            transform-style: preserve-3d;
+            transition: transform 1s ease;
+            z-index: 10;
+        }
+    
+        .book:hover .book-cover {
+            transform: rotateY(-180deg);
+        }
+    
+        .book-spine {
+            position: absolute;
+            width: 20px;
+            height: 100%;
+            left: -10px;
+            top: 0;
+            background: linear-gradient(90deg, #3c1b0c, #5c2816);
+            transform: rotateY(-90deg) translateX(-10px);
+            border-radius: 3px 0 0 3px;
+            box-shadow: inset -2px 0 5px rgba(0,0,0,0.5);
+        }
+    
+        .book-front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #5c2816, #3c1b0c);
+            border-radius: 2px 5px 5px 2px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 
+                0 2px 5px rgba(0,0,0,0.5),
+                0 0 15px rgba(255, 0, 0, 0.4);
+            backface-visibility: hidden;
+        }
+    
+        .book-front::before {
+            content: '';
+            position: absolute;
+            width: 80%;
+            height: 90%;
+            border: 2px solid rgba(153, 101, 21, 0.5);
+            box-sizing: border-box;
+        }
+    
+        .book-front::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='rgba(130, 80, 10, 0.1)' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.7;
+        }
+    
+        .book-title {
+            font-family: 'Nosifer', cursive;
+            font-size: 1.5rem;
+            color: #c98d3f;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.8), 0 0 10px rgba(201, 141, 63, 0.6);
+            z-index: 10;
+        }
+    
+        .book-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #3c1b0c;
+            border-radius: 5px 2px 2px 5px;
+            transform: translateZ(-5px);
+        }
+    
+        .page {
+            position: absolute;
+            width: 90%;
+            height: 95%;
+            left: 5%;
+            top: 2.5%;
+            background: #f0e9d0;
+            border-radius: 0 4px 4px 0;
+            background-image: 
+                linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 5%, rgba(0,0,0,0) 95%, rgba(0,0,0,0.1) 100%),
+                linear-gradient(#f0e9d0 0.1em, transparent 0.1em);
+            background-size: 100% 1.5em;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            transform-origin: left;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 5;
+            backface-visibility: hidden;
+        }
+    
+        .page::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(154, 58, 58, 0.05) 0%, rgba(154, 58, 58, 0) 70%),
+                radial-gradient(circle at 80% 20%, rgba(154, 58, 58, 0.05) 0%, rgba(154, 58, 58, 0) 70%);
+        }
+    
+        .page-content {
+            padding: 20px;
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 1rem;
+            color: #5c2816;
+            text-align: center;
+        }
+    
+        /* Default page positions */
+        .page-1 { transform: rotateY(0deg); z-index: 4; }
+        .page-2 { transform: rotateY(0deg); z-index: 3; }
+        .page-3 { transform: rotateY(0deg); z-index: 2; }
+        .page-4 { transform: rotateY(0deg); z-index: 1; }
+    
+        /* Page turning animation on hover */
+        .book:hover .page-1 { transform: rotateY(-30deg); transition-delay: 0.2s; }
+        .book:hover .page-2 { transform: rotateY(-60deg); transition-delay: 0.4s; }
+        .book:hover .page-3 { transform: rotateY(-90deg); transition-delay: 0.6s; }
+        .book:hover .page-4 { transform: rotateY(-120deg); transition-delay: 0.8s; }
+    
+        /* Add blood effects and symbols */
+        .book:hover .page::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L35 25 L30 45 L25 25 Z M15 15 L45 45 M45 15 L15 45 M20 30 C20 25, 40 25, 40 30 C40 35, 20 35, 20 30 Z' stroke='rgba(120, 0, 0, 0.2)' fill='none'/%3E%3C/svg%3E");
+            opacity: 0;
+            animation: fadeInRunes 2s forwards;
+        }
+    
+        @keyframes fadeInRunes {
+            from { opacity: 0; }
+            to { opacity: 0.7; }
+        }
+    
+        /* Blood stain effect */
+        .book:hover .page-2::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 25%;
+            width: 50%;
+            height: 30%;
+            background: radial-gradient(ellipse at center, rgba(130, 0, 0, 0.2) 0%, rgba(130, 0, 0, 0) 70%);
+            border-radius: 50%;
+        }
+    
+        .book:hover .page-1 {
+            transform: rotateY(-60deg);
+            transition-delay: 0.2s;
+        }
+        
+        .book:hover .page-2 {
+            transform: rotateY(-65deg);
+            transition-delay: 0.4s;
+        }
+
+        /* Red glow pulse on hover */
+        .book:hover {
+            filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.3));
+        }
+
+
+        .ribbon {
+            position: absolute;
+            width: 8px;
+            height: 180px; /* slightly longer than the book */
+            background: #990000;
+            
+            right: 40%;
+            z-index: 3;
+            transform-origin: top;
+            transform: rotateZ(5deg);
+            box-shadow: -1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+
+
     </style>
 </head>
 <body>
     <div id="particles-js"></div>
-    <div class="header-container">
+    <!-- <div class="header-container">
         <div class="interface-container">
             <div class="left-buttons">
                 <button><a href="{{ url_for('landing') }}">Home</a></button>
@@ -272,7 +493,34 @@
                 <button><a href="{{ url_for('game') }}">Start Game</a></button>
             </div>
         </div>
+    </div> -->
+
+
+    <div class="book-header-container">
+        <div class="book" onclick="location.href='/lore'">
+            <div class="book-cover">
+                <div class="book-spine"></div>
+                <div class="book-front">
+                    <div class="book-title">Lost</div>
+                </div>
+            </div>
+            <div class="page page-1">
+                <div class="page-content">Made by Haitham And Ahmed</div>
+            </div>
+            <div class="page page-2">
+                <div class="page-content">Darkness Falls</div>
+            </div>
+            <div class="page page-3">
+                <div class="page-content">The Abyss</div>
+            </div>
+            <div class="page page-4">
+                <div class="page-content">Awaits You</div>
+            </div>
+            <div class="ribbon"></div>
+            <div class="book-back"></div>
+        </div>
     </div>
+    
     <h1 class="title">Lost</h1>
     <center><h3>Let the hunt begin</h3></center>
     <button class="welcome-btn"><a href="/auth">Enter if You Dare</a></button>
@@ -369,5 +617,61 @@
         }
 
     </script>
+
+    <script>
+        // Add mouse interaction for subtle book movement
+        document.addEventListener('mousemove', (event) => {
+            const book = document.querySelector('.book');
+            if (!book) return;
+            
+            const rect = book.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const dx = (event.clientX - centerX) / window.innerWidth;
+            const dy = (event.clientY - centerY) / window.innerHeight;
+            
+            // Only apply subtle rotation if not hovered
+            if (!book.matches(':hover')) {
+                book.style.transform = `rotateX(${10 - dy * 3}deg) rotateY(${dx * 3}deg) translateY(${-dy * 10}px)`;
+            }
+        });
+        
+        // Make book close directly when mouse leaves
+        document.querySelector('.book').addEventListener('mouseleave', function() {
+            // Remove hover effects immediately
+            this.style.transition = 'all 0.3s ease';
+            
+            // Override transform to default position
+            this.style.transform = `rotateX(10deg) rotateY(0deg) translateY(0)`;
+            
+            // Reset pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.transition = 'transform 0.3s ease';
+                page.style.transform = 'rotateY(0deg)';
+            });
+            
+            // Reset cover
+            document.querySelector('.book-cover').style.transition = 'transform 0.3s ease';
+            document.querySelector('.book-cover').style.transform = 'rotateY(0deg)';
+            
+            // Reset transition after animation completes
+            setTimeout(() => {
+                this.style.transition = '';
+                document.querySelectorAll('.page').forEach(page => {
+                    page.style.transition = '';
+                });
+                document.querySelector('.book-cover').style.transition = '';
+                
+                // Remove inline styles completely to allow CSS hover effects to work again
+                this.removeAttribute('style');
+                document.querySelectorAll('.page').forEach(page => {
+                    page.removeAttribute('style');
+                });
+                document.querySelector('.book-cover').removeAttribute('style');
+            }, 300);
+        });
+    </script>
+
 </body>
 </html>
