@@ -356,7 +356,7 @@ async def update_account(
                 {
                     "request": request, 
                     "user_info": user_info, 
-                    "error": "The passwords do not match. Please try again."
+                    "error": "The cursed passwords do not align. Try again."
                 }
             )
     else:
@@ -372,21 +372,21 @@ async def update_account(
         session_json = json.dumps(session_data)
         response.set_cookie(key="user_session", value=session_json)
         
-        success_message = "Your account has been successfully updated!"
+        success_message = "Your unholy account has been successfully updated!"
         success_data = json.dumps({"success": success_message})
         response.set_cookie(key="success_message", value=success_data, max_age=30)
         
         return response
     
     except Exception as e:
-        error_msg = "An error occurred. Please try again."
+        error_msg = "A supernatural error occurred. Try again if you dare."
         if isinstance(e, pymysql.err.IntegrityError):
             error_str = str(e)
             if "Duplicate entry" in error_str:
                 if "email" in error_str:
-                    error_msg = "This email is already in use. Please try another."
+                    error_msg = "This infernal email has already been sacrificed. Try another"
                 else:
-                    error_msg = "This username is already taken. Please choose another."
+                    error_msg = "This unholy username has already been claimed. Choose another."
         
         return templates.TemplateResponse(
             "manage.html", 

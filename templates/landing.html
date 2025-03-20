@@ -265,7 +265,7 @@
         .book {
             position: relative;
             width: 120px;  /* Medium size */
-            height: 160px;
+            height: 140px;
             transform-style: preserve-3d;
             transform: rotateX(10deg);
             transition: transform 0.8s ease;
@@ -334,20 +334,40 @@
             height: 90%;
             border: 2px solid rgba(153, 101, 21, 0.5);
             box-sizing: border-box;
+            background-image: 
+                radial-gradient(ellipse at 30% 20%, rgba(130, 0, 0, 0.4) 0%, rgba(130, 0, 0, 0) 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(130, 0, 0, 0.4) 0%, rgba(130, 0, 0, 0) 60%);
         }
     
+        .book:hover .book-front::after {
+            opacity: 1;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='rgba(130, 80, 10, 0.1)' fill-rule='evenodd'/%3E%3C/svg%3E"),
+                linear-gradient(45deg, transparent 20%, rgba(130, 0, 0, 0.6) 20%, rgba(130, 0, 0, 0.6) 21%, transparent 21%),
+                /* Second diagonal cut with more blood */
+                linear-gradient(-45deg, transparent 70%, rgba(130, 0, 0, 0.6) 70%, rgba(130, 0, 0, 0.6) 71%, transparent 71%),
+                /* Blood drips */
+                radial-gradient(ellipse at 21% 25%, rgba(130, 0, 0, 0.7) 0%, rgba(130, 0, 0, 0) 50%),
+                radial-gradient(ellipse at 71% 75%, rgba(130, 0, 0, 0.7) 0%, rgba(130, 0, 0, 0) 50%);
+        }
+
         .book-front::after {
             content: '';
             position: absolute;
             width: 100%;
             height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='rgba(130, 80, 10, 0.1)' fill-rule='evenodd'/%3E%3C/svg%3E");
+            background-image: 
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='rgba(130, 80, 10, 0.1)' fill-rule='evenodd'/%3E%3C/svg%3E"),
+                /* First diagonal cut */
+                linear-gradient(45deg, transparent 20%, rgba(100, 0, 0, 0.2) 20%, rgba(100, 0, 0, 0.2) 21%, transparent 21%),
+                /* Second diagonal cut */
+                linear-gradient(-45deg, transparent 70%, rgba(100, 0, 0, 0.2) 70%, rgba(100, 0, 0, 0.2) 71%, transparent 71%);
             opacity: 0.7;
         }
     
         .book-title {
             font-family: 'Nosifer', cursive;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             color: #c98d3f;
             text-align: center;
             text-shadow: 0 0 5px rgba(0, 0, 0, 0.8), 0 0 10px rgba(201, 141, 63, 0.6);
@@ -459,7 +479,7 @@
         .ribbon {
             position: absolute;
             width: 8px;
-            height: 180px; /* slightly longer than the book */
+            height: 160px; /* slightly longer than the book */
             background: #990000;
             
             right: 40%;
@@ -501,7 +521,7 @@
             <div class="book-cover">
                 <div class="book-spine"></div>
                 <div class="book-front">
-                    <div class="book-title">Lost</div>
+                    <div class="book-title">The Lore</div>
                 </div>
             </div>
             <div class="page page-1">
@@ -567,55 +587,7 @@
             </style>`
         );
 
-        const header = document.querySelector('.header');
-        const pupil = document.querySelector('.pupil');
-        const leftButtons = document.querySelector('.left-buttons');
-        const rightButtons = document.querySelector('.right-buttons');
-
-        function toggleButtons() {
-            leftButtons.classList.toggle('visible');
-            rightButtons.classList.toggle('visible');
-            
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach((btn, index) => {
-                btn.style.animationDelay = `${index * 0.1}s`;
-            });
-        }
-
-        document.addEventListener('mousemove', (event) => {
-            const rect = header.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            
-            const dx = event.clientX - centerX;
-            const dy = event.clientY - centerY;
-            const angle = Math.atan2(dy, dx);
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            const maxDistance = 15;
-            const ratio = Math.min(maxDistance / distance, 1);
-
-            const offsetX = dx * ratio * 0.3;
-            const offsetY = dy * ratio * 0.3;
-
-            pupil.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-        });
-
-        // Add random additional blinks
-        function addRandomBlink() {
-            const eyelids = document.querySelectorAll('.eyelid');
-            const randomDelay = Math.random() * 5000 + 2000; // Random delay between 2-7 seconds
-            
-            setTimeout(() => {
-                eyelids.forEach(eyelid => {
-                    eyelid.style.animation = 'none';
-                    eyelid.offsetHeight; // Trigger reflow
-                    eyelid.style.animation = 'blink 4s infinite';
-                });
-                addRandomBlink();
-            }, randomDelay);
-        }
-
+    
     </script>
 
     <script>
