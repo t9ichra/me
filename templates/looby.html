@@ -910,5 +910,36 @@
         });
         
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("DOM fully loaded and parsed");
+            
+            // Join Game Form handling
+            const joinGameForm = document.querySelector("#joinGameModal .modal-form");
+            const joinGameModal = document.getElementById("joinGameModal");
+            
+            if (joinGameForm) {
+                joinGameForm.addEventListener("submit", function (event) {
+                    event.preventDefault();
+                    console.log("Join Game button clicked!");
+                    
+                    const gameIdInput = joinGameForm.querySelector("input[type='text']");
+                    const gameId = gameIdInput.value.trim();
+                    
+                    if (!gameId) {
+                        alert("Please enter a valid game code");
+                        return;
+                    }
+                    
+                    console.log(`Attempting to join game: ${gameId}`);
+                    
+                    joinGameModal.classList.remove('active');
+                    window.location.href = `http://127.0.0.1:8000/private/${gameId}/player2`;
+                });
+            } else {
+                console.error("Join game form element not found!");
+            }
+        });
+    </script>
 </body>
 </html>
