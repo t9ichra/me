@@ -40,6 +40,15 @@ playerImageFront.src = 'persoFront.png';
 const playerImageBack = new Image();
 playerImageBack.src = 'persoBack.png';
 
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  resizeCanvas();
+
+  window.addEventListener('resize', resizeCanvas);
+
 let cle = {};
 const keys = [];
 const keyImage = new Image();
@@ -463,6 +472,49 @@ function updateCamera(e) {
 
 function castRay(rayAngle) {
 
+    function renderFloor() {
+        // Only render if the texture is loaded
+        if (!floorTexture.complete) return;
+        
+        const horizonY = canvas.height / 2;
+        
+        // For each vertical screen strip
+        for (let x = 0; x < canvas.width; x++) {
+            // Calculate the ray angle for this x position
+            const rayAngle = playerAngle + (x / RAYS - 0.5) * FOV;
+            
+            // For each vertical pixel in the lower half of the screen
+            for (let y = horizonY + 1; y < canvas.height; y++) {
+                // Calculate distance to the point on the floor
+                const rowDistance = (canvas.height / 2) / (y - canvas.height / 2);
+                
+                // Calculate the floor position
+                const floorX = playerPos.x + Math.cos(rayAngle) * rowDistance;
+                const floorY = playerPos.y + Math.sin(rayAngle) * rowDistance;
+                
+                // Get the texture coordinates
+                const textureX = Math.floor((floorX % 1) * floorTexture.width) % floorTexture.width;
+                const textureY = Math.floor((floorY % 1) * floorTexture.height) % floorTexture.height;
+                
+                // Apply fog/distance effect
+                const brightness = 1 / (1 + rowDistance * 0.1);
+                ctx.globalAlpha = brightness;
+                
+                // Draw the pixel
+                ctx.drawImage(
+                    floorTexture,
+                    textureX, textureY,
+                    1, 1,
+                    x, y,
+                    1, 1
+                );
+            }
+        }
+        
+        // Reset alpha
+        ctx.globalAlpha = 1;
+    }
+    
     rayAngle = rayAngle % (2 * Math.PI);
     if (rayAngle < 0) rayAngle += 2 * Math.PI;
 
@@ -568,18 +620,33 @@ initAudio();
 const wallTexture = new Image();
 wallTexture.src = 'mossy.png';
 
+const floorTexture = new Image();
+floorTexture.src = 'floor.png'; 
+
 const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height / 2);
-skyGradient.addColorStop(0, '#808080 '); 
-skyGradient.addColorStop(0.7, '#c0c0c0'); 
-skyGradient.addColorStop(1, '#dcdcdc');   
+skyGradient.addColorStop(0, '#100c08'); 
+skyGradient.addColorStop(0.7, '#253529'); 
+skyGradient.addColorStop(1, '#004242 ');   
+
+
+
+
 
 function render() {
     movePlayer();
 
     ctx.fillStyle = skyGradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height / 2);  
-    ctx.fillStyle = '#708090';
-    ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);  
+    ctx.fillRect(0, 0, canvas.width, canvas.height / 2); 
+     
+let gradient = ctx.createLinearGradient(0, canvas.height / 2, 0, canvas.height);
+
+
+gradient.addColorStop(0, '#4A5D23');      // Slate gray at the top
+gradient.addColorStop(1, '#4A5D23');      // Darker slate gray at the bottom
+
+// Use the gradient as your fillStyle
+ctx.fillStyle = gradient;
+ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
 
 
     addKeysToMap();
