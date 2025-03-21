@@ -860,9 +860,13 @@
         }
 
         addRandomBlink();
+
     </script>
 
     <script>
+
+        const currentUsername = "{{ username }}";
+
         document.addEventListener("DOMContentLoaded", function () {
             console.log("DOM fully loaded and parsed");
             const createGameForm = document.querySelector("#createGameModal .modal-form");
@@ -897,7 +901,7 @@
                             console.log(`Game ID: ${gameId}`);
                             alert(`Game Created! ID: ${gameId}`);
                             createGameModal.classList.remove('active');
-                            window.location.href = `http://127.0.0.1:8000/${gameType}/${gameId}/player1`;
+                            window.location.href = `http://127.0.0.1:8000/${gameType}/${gameId}/${currentUsername}`;
                         })
                         .catch(error => {
                             console.error("Error creating game:", error);
@@ -934,7 +938,7 @@
                     console.log(`Attempting to join game: ${gameId}`);
                     
                     joinGameModal.classList.remove('active');
-                    window.location.href = `http://127.0.0.1:8000/private/${gameId}/player2`;
+                    window.location.href = `http://127.0.0.1:8000/private/${gameId}/${currentUsername}`;
                 });
             } else {
                 console.error("Join game form element not found!");

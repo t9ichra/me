@@ -272,7 +272,12 @@ async def lobby(request: Request):
     redirect_response = require_auth(request)
     if redirect_response:
         return redirect_response
-    return templates.TemplateResponse("looby.html", {"request": request})
+    
+    user_session = request.cookies.get("user_session")
+    session_data = json.loads(user_session)
+    username = session_data.get("username", "Unknown")
+    
+    return templates.TemplateResponse("looby.html", {"request": request, "username": username})
 
 @app.get("/lore", response_class=HTMLResponse)
 async def lore(request: Request):
