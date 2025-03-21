@@ -10,17 +10,17 @@ import uuid
 from pydantic import BaseModel
 from typing import Optional
 
-# Create the main FastAPI application
+
 app = FastAPI()
 
-# Configure templates and static files
+
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Configure password handling
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Database connection function
+
 def get_db_connection():
     return pymysql.connect(
         host="localhost",
@@ -30,7 +30,7 @@ def get_db_connection():
         cursorclass=pymysql.cursors.DictCursor
     )
 
-# Authentication and session functions
+
 def get_user_from_session(user_session: str = Cookie(None)):
     if not user_session:
         raise HTTPException(status_code=401, detail="User not logged in")
@@ -44,7 +44,7 @@ def get_user_from_session(user_session: str = Cookie(None)):
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid session data")
 
-# Optional user authentication that doesn't raise an exception
+
 def get_optional_user(user_session: str = Cookie(None)):
     if not user_session:
         return None
@@ -58,7 +58,7 @@ def get_optional_user(user_session: str = Cookie(None)):
     except json.JSONDecodeError:
         return None
 
-# User management functions
+
 def fetch_user_info(username: str):
     connection = get_db_connection()
     try:
@@ -70,7 +70,7 @@ def fetch_user_info(username: str):
 def update_user_info(username: str, new_username: str, email: str, password: str = None):
     connection = get_db_connection()
     try:
-        # Check for duplicate username if it's changed
+        
         if username != new_username:
             with connection.cursor() as cursor:
                 cursor.execute("SELECT * FROM user WHERE username = %s", (new_username,))
@@ -79,7 +79,7 @@ def update_user_info(username: str, new_username: str, email: str, password: str
         
         with connection.cursor() as cursor:
             if password:
-                # Update including the password
+                
                 hashed_password = pwd_context.hash(password)
                 cursor.execute("""
                     UPDATE user 
@@ -87,7 +87,7 @@ def update_user_info(username: str, new_username: str, email: str, password: str
                     WHERE username = %s
                 """, (new_username, email, hashed_password, username))
             else:
-                # Update without changing the password
+              
                 cursor.execute("""
                     UPDATE user 
                     SET username = %s, email = %s 
@@ -107,7 +107,7 @@ def delete_user(username: str):
     finally:
         connection.close()
 
-# Authentication middleware
+
 def require_auth(request: Request):
     user_session = request.cookies.get("user_session")
     if not user_session:
@@ -122,7 +122,7 @@ def require_auth(request: Request):
     except json.JSONDecodeError:
         return RedirectResponse(url="/", status_code=303)
 
-# Model class definitions
+
 class LoginRequest(BaseModel):
     email: str
     password: str
@@ -132,7 +132,7 @@ class SignupRequest(BaseModel):
     email: str
     password: str
 
-# Public routes
+
 @app.get("/", response_class=HTMLResponse)
 async def landing(request: Request):
     return templates.TemplateResponse("landing.html", {"request": request})
@@ -266,7 +266,7 @@ async def signup(
         cursor.close()
         connection.close()
 
-# Protected routes that require authentication
+
 @app.get("/lobby", response_class=HTMLResponse)
 async def lobby(request: Request):
     redirect_response = require_auth(request)
@@ -353,7 +353,7 @@ async def update_account(
     
     user_info = fetch_user_info(current_username)
 
-    # Handle password update only if both fields are filled
+
     if password and confirmPassword:
         if password != confirmPassword:
             return templates.TemplateResponse(
@@ -365,14 +365,14 @@ async def update_account(
                 }
             )
     else:
-        password = None  # Don't update password if left empty
+        password = None  # MATBDLCH L PASSWORD ILA KAN NULL !!!!!!!!!!!!! HOOOOOOOOOOOOOO
     
     try:
         update_user_info(current_username, username, email, password)
         
         response = RedirectResponse(url="/manage", status_code=303)
         
-        # Update session if username changes
+        
         session_data["username"] = username
         session_json = json.dumps(session_data)
         response.set_cookie(key="user_session", value=session_json)
@@ -423,12 +423,74 @@ async def delete_account(request: Request):
             {"request": request, "user_info": fetch_user_info(username), "error": str(e)}
         )
 
+
+@app.get("/ban/{username}")
+async def ban_user(request: Request, username: str):
+    redirect_response = require_auth(request)
+    if redirect_response:
+        return redirect_response
+    
+    user_session = request.cookies.get("user_session")
+    session_data = json.loads(user_session)
+    current_username = session_data.get("username")
+    
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT id_user FROM user WHERE username = %s", (username,))
+            user = cursor.fetchone()
+            
+            if not user:
+                raise HTTPException(status_code=404, detail=f"User '{username}' not found")
+            
+            user_id = user['id_user']
+            
+            cursor.execute("UPDATE user SET isBanned = '1' WHERE id_user = %s", (user_id,))
+            
+            from datetime import datetime, timedelta
+            ban_time = datetime.now()
+            unban_time = ban_time + timedelta(days=3)
+            
+            ban_time_str = ban_time.strftime("%Y-%m-%d %H:%M:%S")
+            unban_time_str = unban_time.strftime("%Y-%m-%d %H:%M:%S")
+            
+            cursor.execute(
+                "INSERT INTO ban (id_user, ban_time, unban_time, reason) VALUES (%s, %s, %s, %s)",
+                (
+                    user_id, 
+                    ban_time_str, 
+                    unban_time_str, 
+                    "You violated the rules and used offensive language."
+                )
+            )
+            
+            connection.commit()
+            
+            if username == current_username:
+                response = RedirectResponse(url="/", status_code=303)
+                response.delete_cookie(key="user_session")
+                return response
+            
+            return JSONResponse(
+                content={
+                    "message": f"User '{username}' has been banished for 3 days",
+                    "ban_time": ban_time_str,
+                    "unban_time": unban_time_str
+                },
+                status_code=200
+            )
+            
+    except Exception as e:
+        connection.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to ban user: {str(e)}")
+    finally:
+        connection.close()
+
 @app.get("/disconnect")
 async def disconnect():
     response = RedirectResponse(url="/", status_code=303)
     response.delete_cookie(key="user_session")
     return response
 
-# Main entry point to run the application
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8080)
