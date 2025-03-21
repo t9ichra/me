@@ -618,18 +618,35 @@ function movePlayer() {
 initAudio();
 
 const wallTexture = new Image();
-wallTexture.src = 'mossy.png';
+wallTexture.src = 'download.png';
 
-const floorTexture = new Image();
-floorTexture.src = 'floor.png'; 
+const povHandImage = new Image();
+povHandImage.src = 'pov.png';
+
+
 
 const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height / 2);
-skyGradient.addColorStop(0, '#100c08'); 
-skyGradient.addColorStop(0.7, '#253529'); 
-skyGradient.addColorStop(1, '#004242 ');   
+skyGradient.addColorStop(0, '#5b5959'); 
+skyGradient.addColorStop(0.7, '#5b5959'); 
+skyGradient.addColorStop(1, '#5b5959');   
 
 
 
+
+function createWallLightSpot(x, centerX, radius) {
+    // Calculate distance from center of view
+    const distance = Math.abs(x - centerX);
+    
+    // Create a more circular light spot effect with sharper edges
+    let intensity = 1 - Math.pow(distance / radius, 2); // Squared falloff for more circular shape
+    intensity = Math.max(0, intensity); // Clamp to positive values
+    
+    // Make the falloff more pronounced for a spotlight effect
+    // Higher exponent = sharper edge transition
+    intensity = Math.pow(intensity, 3);
+    
+    return intensity;
+}
 
 
 function render() {
@@ -640,9 +657,8 @@ function render() {
      
 let gradient = ctx.createLinearGradient(0, canvas.height / 2, 0, canvas.height);
 
-
-gradient.addColorStop(0, '#4A5D23');      // Slate gray at the top
-gradient.addColorStop(1, '#4A5D23');      // Darker slate gray at the bottom
+gradient.addColorStop(0, '#464242');      
+gradient.addColorStop(1, '#191818');     
 
 // Use the gradient as your fillStyle
 ctx.fillStyle = gradient;
@@ -660,8 +676,11 @@ ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
     simulateLightning();
     renderLightning();
 
+    const centerX = canvas.width / 2;
+    const lightRadius = canvas.width * 0.12;
 
-    for (let x = 0; x < RAYS; x++) {
+
+   for (let x = 0; x < RAYS; x++) {
         const rayAngle = playerAngle + (x / RAYS - 0.5) * FOV;
         const ray = castRay(rayAngle);
 
@@ -673,8 +692,18 @@ ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
 
         if (wallTexture.complete) {
             const textureX = Math.floor(ray.wallX * wallTexture.width);
-            const brightness = ray.side === 1 ? 0.7 : 1;
-            ctx.globalAlpha = brightness / (1 + correctDistance * 0.1);
+            
+            // Calculate base brightness from side and distance
+            let brightness = ray.side === 1 ? 0.7 : 1;
+            brightness = brightness / (1 + correctDistance * 0.1);
+            
+            // Get the light spot intensity for this column
+            const lightIntensity = createWallLightSpot(x, centerX, lightRadius);
+            
+            // Add the light spot on top of the regular brightness
+            const spotBrightness = Math.min(brightness + lightIntensity * 0.6, 1.0);
+            
+            ctx.globalAlpha = spotBrightness;
             
             ctx.drawImage(
                 wallTexture,
@@ -685,10 +714,36 @@ ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
             );
             
             ctx.globalAlpha = 1;
+
+            // Draw a more defined circular light spot effect on the wall
+            if (lightIntensity > 0.05) {
+                // Create a gradient overlay for each column to enhance the circular appearance
+                const gradientAlpha = lightIntensity * 0.35; // Slightly stronger glow
+                
+                // Use a warm light color with gradient transparency
+                ctx.fillStyle = `rgba(255, 255, 230, ${gradientAlpha})`;
+                ctx.fillRect(x, wallTop, 1, wallBottom - wallTop);
+                
+                // Add a subtle highlight in the very center for a more realistic light effect
+                if (lightIntensity > 0.8) {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${(lightIntensity - 0.8) * 0.5})`;
+                    ctx.fillRect(x, wallTop, 1, wallBottom - wallTop);
+                }
+            }
         }
     }
     renderSprites();
     renderKeyCounter();
+
+    if (povHandImage.complete) {
+        const handWidth = canvas.width * 0.6; // Adjust size as needed
+        const handHeight = handWidth * (povHandImage.height / povHandImage.width);
+        const handX = canvas.width - handWidth;
+        const handY = canvas.height - handHeight;
+        
+        ctx.drawImage(povHandImage, handX, handY, handWidth, handHeight);
+    }
+    
     requestAnimationFrame(render);
 }
 
