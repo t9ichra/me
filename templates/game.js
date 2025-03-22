@@ -215,50 +215,67 @@ const RAYS = canvas.width;
 const MOUSE_SENSITIVITY = 0.002;
 
 const rainDrops = [];
-const MAX_RAIN_DROPS = 600;  
+const MAX_RAIN_DROPS = 3000;  
 const rainColor = 'rgba(200, 220, 255, 0.7)';
 
 function generateRain() {
-
-    if (rainDrops.length < MAX_RAIN_DROPS && Math.random() < 0.2) {
+    if (rainDrops.length < MAX_RAIN_DROPS && Math.random() < 0.6) {
         rainDrops.push({
             x: Math.random() * canvas.width,
-            y: 0,
-            speed: 5 + Math.random() * 5, 
-            length: 8 + Math.random() * 12,
-            thickness: 1 + Math.random() * 1.5, 
-            opacity: 0.5 + Math.random() * 0.5  
+            y: -10, // Start slightly above screen for smooth entry
+            speed: 7 + Math.random() * 10, // Faster rain
+            length: 10 + Math.random() * 20, // Longer streaks
+            thickness: 1 + Math.random() * 2,
+            opacity: 0.6 + Math.random() * 0.3,
+            terminalY: canvas.height * (0.5 + Math.random() * 0.1) // Rain stops at floor level
         });
     }
 }
 
 function renderRain() {
-    ctx.strokeStyle = rainColor;
-    ctx.lineWidth = 1;
+    ctx.save();
     
-    rainDrops.forEach((drop, index) => {
+    // More realistic rain color with subtle blue tint
+    const baseRainColor = 'rgba(210, 230, 255, ';
+    
+    rainDrops.forEach(drop => {
+        // Adjust opacity based on depth (simulating distance)
+        const finalOpacity = drop.opacity * (0.7 + Math.random() * 0.3);
+        ctx.strokeStyle = baseRainColor + finalOpacity + ')';
+        ctx.lineWidth = drop.thickness;
+        
         ctx.beginPath();
-        ctx.globalAlpha = drop.opacity;
+        
+        // Angle the rain slightly for more realism
+        const rainAngle = 0.15; // Slight angle
+        const xOffset = drop.length * Math.sin(rainAngle);
+        
         ctx.moveTo(drop.x, drop.y);
-        ctx.lineTo(drop.x, drop.y + drop.length);
+        ctx.lineTo(drop.x + xOffset, Math.min(drop.y + drop.length, drop.terminalY));
         ctx.stroke();
+        
+        // Add a small splash if the rain hits the floor
+        if (drop.y + drop.length >= drop.terminalY && Math.random() < 0.6) {
+            createSplash(drop.x + xOffset, drop.terminalY, drop.speed / 8);
+        }
     });
     
-    ctx.globalAlpha = 1;
+    ctx.restore();
 }
 
 
 function animateRain() {
-for (let i = rainDrops.length - 1; i >= 0; i--) {
-const drop = rainDrops[i];
-drop.y += drop.speed;
+    for (let i = rainDrops.length - 1; i >= 0; i--) {
+        const drop = rainDrops[i];
+        drop.y += drop.speed;
+        
+        // Remove drops that go beyond their terminal point (floor level)
+        if (drop.y > drop.terminalY + 5) {
+            rainDrops.splice(i, 1);
+        }
+    }
+}
 
-
-if (drop.y > canvas.height) {
-    rainDrops.splice(i, 1);
-}
-}
-}
 
 class LightningBolt {
 constructor() {
@@ -470,50 +487,108 @@ function updateCamera(e) {
     playerAngle += e.movementX * MOUSE_SENSITIVITY;
 }
 
-function castRay(rayAngle) {
 
-    function renderFloor() {
-        // Only render if the texture is loaded
-        if (!floorTexture.complete) return;
+function createSplash(x, y, size) {
+    if (!window.splashes) {
+        window.splashes = [];
+    }
+    
+    // Create a new splash
+    window.splashes.push({
+        x: x,
+        y: y,
+        size: size,
+        opacity: 0.7,
+        lifetime: 10 + Math.random() * 10
+    });
+}
+
+function createRainSplashes() {
+    // Manage the existing window splash effects
+    if (!window.rainSplashes) {
+        window.rainSplashes = [];
+    }
+    
+    // Add new larger splashes occasionally on the floor level only
+    const floorLevel = canvas.height * 0.6; // Match this to your floor level
+    if (window.rainSplashes.length < 30 && Math.random() < 0.05) {
+        window.rainSplashes.push({
+            x: Math.random() * canvas.width,
+            y: floorLevel + Math.random() * 10, // Only on floor level
+            size: 2 + Math.random() * 6,
+            opacity: 0.5 + Math.random() * 0.3,
+            lifetime: 15 + Math.random() * 30,
+            expansionRate: 0.2 + Math.random() * 0.4
+        });
+    }
+    
+    // Process small splashes from individual raindrops
+    if (window.splashes) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(200, 220, 255, 0.5)';
         
-        const horizonY = canvas.height / 2;
-        
-        // For each vertical screen strip
-        for (let x = 0; x < canvas.width; x++) {
-            // Calculate the ray angle for this x position
-            const rayAngle = playerAngle + (x / RAYS - 0.5) * FOV;
+        for (let i = window.splashes.length - 1; i >= 0; i--) {
+            const splash = window.splashes[i];
             
-            // For each vertical pixel in the lower half of the screen
-            for (let y = horizonY + 1; y < canvas.height; y++) {
-                // Calculate distance to the point on the floor
-                const rowDistance = (canvas.height / 2) / (y - canvas.height / 2);
-                
-                // Calculate the floor position
-                const floorX = playerPos.x + Math.cos(rayAngle) * rowDistance;
-                const floorY = playerPos.y + Math.sin(rayAngle) * rowDistance;
-                
-                // Get the texture coordinates
-                const textureX = Math.floor((floorX % 1) * floorTexture.width) % floorTexture.width;
-                const textureY = Math.floor((floorY % 1) * floorTexture.height) % floorTexture.height;
-                
-                // Apply fog/distance effect
-                const brightness = 1 / (1 + rowDistance * 0.1);
-                ctx.globalAlpha = brightness;
-                
-                // Draw the pixel
-                ctx.drawImage(
-                    floorTexture,
-                    textureX, textureY,
-                    1, 1,
-                    x, y,
-                    1, 1
-                );
+            // Draw splash
+            ctx.globalAlpha = splash.opacity;
+            ctx.beginPath();
+            ctx.arc(splash.x, splash.y, splash.size, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Fade and expand splash
+            splash.lifetime--;
+            splash.size += 0.1;
+            splash.opacity -= 0.07;
+            
+            if (splash.lifetime <= 0 || splash.opacity <= 0) {
+                window.splashes.splice(i, 1);
             }
         }
         
-        // Reset alpha
-        ctx.globalAlpha = 1;
+        ctx.restore();
     }
+    
+    // Render and update larger floor splashes
+    ctx.save();
+    ctx.fillStyle = 'rgba(200, 230, 255, 0.4)';
+    
+    for (let i = window.rainSplashes.length - 1; i >= 0; i--) {
+        const splash = window.rainSplashes[i];
+        
+        // Draw splash with ripple effect
+        ctx.globalAlpha = splash.opacity * (splash.lifetime / 40);
+        ctx.beginPath();
+        ctx.arc(splash.x, splash.y, splash.size, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw inner highlight
+        if (splash.size > 3) {
+            ctx.globalAlpha = Math.min(0.5, splash.opacity * 0.7);
+            ctx.beginPath();
+            ctx.arc(splash.x, splash.y, splash.size * 0.6, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(225, 240, 255, 0.3)';
+            ctx.fill();
+        }
+        
+        // Fade and expand splashes
+        splash.lifetime--;
+        splash.size += splash.expansionRate;
+        splash.opacity -= 0.01;
+        
+        if (splash.lifetime <= 0 || splash.opacity <= 0) {
+            window.rainSplashes.splice(i, 1);
+        }
+    }
+    
+    ctx.restore();
+}
+
+
+
+function castRay(rayAngle) {
+
+   
     
     rayAngle = rayAngle % (2 * Math.PI);
     if (rayAngle < 0) rayAngle += 2 * Math.PI;
@@ -618,7 +693,7 @@ function movePlayer() {
 initAudio();
 
 const wallTexture = new Image();
-wallTexture.src = 'download.png';
+wallTexture.src = 'image2.png';
 
 const povHandImage = new Image();
 povHandImage.src = 'pov.png';
@@ -660,7 +735,7 @@ let gradient = ctx.createLinearGradient(0, canvas.height / 2, 0, canvas.height);
 gradient.addColorStop(0, '#464242');      
 gradient.addColorStop(1, '#191818');     
 
-// Use the gradient as your fillStyle
+
 ctx.fillStyle = gradient;
 ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
 
@@ -669,13 +744,7 @@ ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
     checkKeyCollection();
     playRandomHorrorSounds();
 
-    generateRain();
-    animateRain();
-    renderRain();
-
-    simulateLightning();
-    renderLightning();
-
+    
     const centerX = canvas.width / 2;
     const lightRadius = canvas.width * 0.12;
 
@@ -732,6 +801,13 @@ ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
             }
         }
     }
+    generateRain();
+    animateRain();
+    renderRain();
+    createRainSplashes();
+    simulateLightning();
+    renderLightning();
+
     renderSprites();
     renderKeyCounter();
 
