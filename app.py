@@ -200,7 +200,6 @@ async def login(request: Request, email: str = Form(...), password: str = Form(.
         cursor.close()
         connection.close()
 
-
 @app.post("/signup")
 async def signup(
     request: Request, 
@@ -211,6 +210,20 @@ async def signup(
     username = name
     email = emailSignup
     password = signupPassword
+    
+    # Check username length
+    if len(username) < 5 or len(username) > 20:
+        return templates.TemplateResponse(
+            "auth.html", 
+            {"request": request, "error_message": "Your unholy name must be between 5 and 20 characters in length."}
+        )
+        
+    # Check if username is "server"
+    if username.lower() == "server":
+        return templates.TemplateResponse(
+            "auth.html", 
+            {"request": request, "error_message": "The name 'server' is forbidden in this realm. Choose another."}
+        )
     
     hashed_password = pwd_context.hash(password)
     user_id = str(uuid.uuid4())[:10]
@@ -265,7 +278,6 @@ async def signup(
     finally:
         cursor.close()
         connection.close()
-
 
 @app.get("/lobby", response_class=HTMLResponse)
 async def lobby(request: Request):
