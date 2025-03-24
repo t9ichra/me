@@ -902,7 +902,7 @@
         const currentUsername = "{{ username }}";
 
         document.addEventListener("DOMContentLoaded", function () {
-            console.log("DOM fully loaded and parsed");
+         
             const createGameForm = document.querySelector("#createGameModal .modal-form");
             const createGameModal = document.getElementById("createGameModal");
         
@@ -940,17 +940,18 @@
                         .catch(error => {
                             console.error("Error creating game:", error);
                             alert("Failed to create game. Please try again. Error: " + error.message);
+                            // Redirect to lobby on error
+                            window.location.href = "http://127.0.0.1:8080/lobby";
                         });
                 });
             } else {
                 console.error("Create game form element not found!");
             }
         });
-        
+
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            console.log("DOM fully loaded and parsed");
             
             // Join Game Form handling
             const joinGameForm = document.querySelector("#joinGameModal .modal-form");
@@ -971,13 +972,41 @@
                     
                     console.log(`Attempting to join game: ${gameId}`);
                     
+                    fetch(`http://127.0.0.1:8000/public_game`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(games => {
+                    // For private games, we can't verify in advance, but we'll handle WebSocket errors
                     joinGameModal.classList.remove('active');
                     window.location.href = `http://127.0.0.1:8000/private/${gameId}/${currentUsername}`;
+                    
+                    // Add a timeout to check if we successfully connected
+                    setTimeout(() => {
+                        // This will only run if the page load is incomplete or has errors
+                        const ws = new WebSocket(`ws://127.0.0.1:8000/ws/private/${gameId}/${currentUsername}`);
+                        
+                        ws.onerror = function(error) {
+                            console.error("WebSocket error:", error);
+                            alert("Failed to join game. The game might not exist.");
+                            window.location.href = "http://127.0.0.1:8080/lobby";
+                        };
+                    }, 2000);
+                })
+                .catch(error => {
+                    console.error("Error checking game:", error);
+                    alert("Failed to join game. Please try again. Error: " + error.message);
+                    window.location.href = "http://127.0.0.1:8080/lobby";
                 });
-            } else {
-                console.error("Join game form element not found!");
-            }
         });
+    } else {
+        console.error("Join game form element not found!");
+    }
+});
+
     </script>
 </body>
 </html>
