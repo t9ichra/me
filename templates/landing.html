@@ -490,6 +490,44 @@
         }
         
 
+        .error-popup {
+            display: none;
+            position: fixed;
+            border: solid red;
+            top: 10px; 
+            left: 2%;
+            transform: translate(-50%, 0); /* Only center horizontally */
+            z-index: 1000;
+            width: 80%; /* Make it smaller */
+            max-width: 300px; /* Reduce max width from 400px */
+            animation: fadeInScale 0.3s ease forwards;
+        }
+        
+        .error-content {
+            padding: 15px; /* Reduce padding */
+            font-size: 1rem; /* Smaller font size */
+        }
+    
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #ff0000;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, text-shadow 0.3s;
+        }
+    
+        .close-btn:hover {
+            transform: scale(1.2);
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+        }
+    
+        #error-message {
+            margin: 20px 0;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+        }
 
     </style>
 </head>
@@ -541,6 +579,13 @@
         </div>
     </div>
     
+    <div id="error-popup" class="error-popup">
+        <div class="error-content">
+            <span class="close-btn">&times;</span>
+            <p id="error-message">You are not logged in. The shadows reject your presence.</p>
+        </div>
+    </div>
+
     <h1 class="title">Lost</h1>
     <center><h3>Let the hunt begin</h3></center>
     <button class="welcome-btn"><a href="/auth">Enter if You Dare</a></button>
@@ -645,5 +690,27 @@
         });
     </script>
 
+    <script>
+        // Check URL parameters for error message
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const errorMsg = urlParams.get('error');
+            
+            if (errorMsg) {
+                document.getElementById('error-message').textContent = decodeURIComponent(errorMsg);
+                document.getElementById('error-popup').style.display = 'block';
+            }
+            
+            // Close button functionality
+            document.querySelector('.close-btn').addEventListener('click', function() {
+                document.getElementById('error-popup').style.display = 'none';
+                // Remove error parameter from URL
+                const url = new URL(window.location);
+                url.searchParams.delete('error');
+                window.history.replaceState({}, '', url);
+            });
+        }
+    </script>
+    
 </body>
 </html>

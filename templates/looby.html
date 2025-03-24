@@ -629,6 +629,18 @@
                 transform: scaleY(1);
             }
         }
+
+        a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+        
+        a:hover {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        
     </style>
 </head>
 <body>
@@ -637,9 +649,8 @@
         <h1 class="title">Lost</h1>
         <div class="interface-container">
             <div class="left-buttons">
-                <button>Option 1</button>
-                <button>Option 2</button>
-                <button>Option 3</button>
+                <button><a href="/">Home</a></button>
+                <button><a href="/lore">The Lore</a></button>
             </div>
             <div class="header" onclick="toggleButtons()">
                 <div class="eyes">
@@ -649,8 +660,8 @@
                 </div>
             </div>
             <div class="right-buttons">
-                <button>Option 4</button>
-                <button>Option 5</button>
+                <button><a href="/manage">Manage Account</a></button>
+                <button><a href="/disconnect">Disconnect</a></button>
             </div>
         </div>
     </div>

@@ -111,17 +111,19 @@ def delete_user(username: str):
 def require_auth(request: Request):
     user_session = request.cookies.get("user_session")
     if not user_session:
-        return RedirectResponse(url="/", status_code=303)
+        error_message = "You are not logged in. The shadows reject your presence."
+        return RedirectResponse(url=f"/?error={error_message}", status_code=303)
     
     try:
         session_data = json.loads(user_session)
         username = session_data.get("username")
         if not username:
-            return RedirectResponse(url="/", status_code=303)
+            error_message = "Your soul has faded. Login again to restore your existence."
+            return RedirectResponse(url=f"/?error={error_message}", status_code=303)
         return None
     except json.JSONDecodeError:
-        return RedirectResponse(url="/", status_code=303)
-
+        error_message = "Corrupted session. The void has consumed your identity."
+        return RedirectResponse(url=f"/?error={error_message}", status_code=303)
 
 class LoginRequest(BaseModel):
     email: str
