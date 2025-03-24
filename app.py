@@ -349,11 +349,13 @@ async def get_manage_page(request: Request):
         return templates.TemplateResponse("manage.html", context)
     else:
         return RedirectResponse(url="/", status_code=303)
+    
 @app.post("/update_account")
 async def update_account(
     request: Request, 
     username: str = Form(...),
     email: str = Form(...), 
+    oldPassword: str = Form(""),
     password: str = Form(""), 
     confirmPassword: str = Form("")
 ):
@@ -367,26 +369,69 @@ async def update_account(
     
     user_info = fetch_user_info(current_username)
 
+    # If password change is attempted
+    if password or oldPassword:
+        # Check if old password is provided
+        if not oldPassword:
+            return templates.TemplateResponse(
+                "manage.html", 
+                {
+                    "request": request, 
+                    "user_info": user_info, 
+                    "error": "You must provide your current password to change it."
+                }
+            )
 
-    if password and confirmPassword:
+        # Verify old password
+        if not pwd_context.verify(oldPassword, user_info['password']):
+            return templates.TemplateResponse(
+                "manage.html", 
+                {
+                    "request": request, 
+                    "user_info": user_info, 
+                    "error": "The old password is incorrect. Shadows reject your attempt."
+                }
+            )
+
+        # Validate new password
+        if not password:
+            return templates.TemplateResponse(
+                "manage.html", 
+                {
+                    "request": request, 
+                    "user_info": user_info, 
+                    "error": "New password cannot be empty."
+                }
+            )
+
+        # Check if new password is different from old password
+        if pwd_context.verify(password, user_info['password']):
+            return templates.TemplateResponse(
+                "manage.html", 
+                {
+                    "request": request, 
+                    "user_info": user_info, 
+                    "error": "New password must be different from the old password."
+                }
+            )
+
+        # Confirm new password
         if password != confirmPassword:
             return templates.TemplateResponse(
                 "manage.html", 
                 {
                     "request": request, 
                     "user_info": user_info, 
-                    "error": "The cursed passwords do not align. Try again."
+                    "error": "The new passwords do not match. Try again."
                 }
             )
-    else:
-        password = None  # MATBDLCH L PASSWORD ILA KAN NULL !!!!!!!!!!!!! HOOOOOOOOOOOOOO
     
     try:
         update_user_info(current_username, username, email, password)
         
         response = RedirectResponse(url="/manage", status_code=303)
         
-        
+        # Update session with new username if changed
         session_data["username"] = username
         session_json = json.dumps(session_data)
         response.set_cookie(key="user_session", value=session_json)
