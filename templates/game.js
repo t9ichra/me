@@ -36,9 +36,9 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 const playerImageFront = new Image();
-playerImageFront.src = 'persoFront.png';
+playerImageFront.src = '9damT.png';
 const playerImageBack = new Image();
-playerImageBack.src = 'persoBack.png';
+playerImageBack.src = 'lorT.png';
 
 function resizeCanvas() {
     canvas.width = window.innerWidth;
