@@ -901,53 +901,62 @@
 
         const currentUsername = "{{ username }}";
 
-        document.addEventListener("DOMContentLoaded", function () {
-         
-            const createGameForm = document.querySelector("#createGameModal .modal-form");
-            const createGameModal = document.getElementById("createGameModal");
+       document.addEventListener("DOMContentLoaded", function() {
+    // This is the consolidated create game form handler
+    const createGameForm = document.querySelector("#createGameModal .modal-form");
+    const createGameModal = document.getElementById("createGameModal");
+    
+    if (createGameForm) {
+        // Remove any existing event listeners
+        const newCreateForm = createGameForm.cloneNode(true);
+        createGameForm.parentNode.replaceChild(newCreateForm, createGameForm);
         
-            if (createGameForm) {
-                createGameForm.addEventListener("submit", function (event) {
-                    event.preventDefault();
-                    console.log("Create Game button clicked!");
-        
-                    const gameTypeRadios = document.querySelectorAll('input[name="gameType"]');
-                    let gameType = "public";
-        
-                    for (const radio of gameTypeRadios) {
-                        if (radio.checked) {
-                            gameType = radio.value;
-                            break;
-                        }
-                    }
-        
-                    console.log(`Selected game type: ${gameType}`);
-                    const apiUrl = `http://127.0.0.1:8000/new_game/${gameType}`;
-        
-                    fetch(apiUrl)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! Status: ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(gameId => {
-                            console.log(`Game ID: ${gameId}`);
-                            alert(`Game Created! ID: ${gameId}`);
-                            createGameModal.classList.remove('active');
-                            window.location.href = `http://127.0.0.1:8000/${gameType}/${gameId}/${currentUsername}`;
-                        })
-                        .catch(error => {
-                            console.error("Error creating game:", error);
-                            alert("Failed to create game. Please try again. Error: " + error.message);
-                            // Redirect to lobby on error
-                            window.location.href = "http://127.0.0.1:8080/lobby";
-                        });
-                });
-            } else {
-                console.error("Create game form element not found!");
+        // Add our single event listener
+        newCreateForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+            console.log("Create Game button clicked!");
+            
+            const gameTypeRadios = document.querySelectorAll('input[name="gameType"]');
+            let gameType = "public";
+            
+            for (const radio of gameTypeRadios) {
+                if (radio.checked) {
+                    gameType = radio.value;
+                    break;
+                }
             }
+            
+            console.log(`Selected game type: ${gameType}`);
+            const apiUrl = `http://127.0.0.1:8000/new_game/${gameType}`;
+            
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(gameId => {
+                    console.log(`Game ID: ${gameId}`);
+                    alert(`Game Created! ID: ${gameId}`);
+                    createGameModal.classList.remove('active');
+                    
+                    // Record history before redirecting
+                    recordGameHistory(gameId, gameType);
+                    
+                    window.location.href = `http://127.0.0.1:8000/${gameType}/${gameId}/${currentUsername}`;
+                })
+                .catch(error => {
+                    console.error("Error creating game:", error);
+                    alert("Failed to create game. Please try again. Error: " + error.message);
+                    // Redirect to lobby on error
+                    window.location.href = "http://127.0.0.1:8080/lobby";
+                });
         });
+    } else {
+        console.error("Create game form element not found!");
+    }
+});
 
     </script>
     <script>
@@ -1006,6 +1015,110 @@
         console.error("Join game form element not found!");
     }
 });
+
+    </script>
+
+    <script>
+        // Function to record game history
+function recordGameHistory(gameId, gameType) {
+    const username = currentUsername; // Already available from your template
+    
+    // Create the data object to send
+    const historyData = {
+        username: username,
+        gameId: gameId,
+        gameType: gameType
+    };
+    
+    // Make API call to record history
+    fetch('http://127.0.0.1:8080/record_history', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(historyData),
+        credentials: 'include' // Include cookies in the request
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.error('Failed to record game history');
+            return null;
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data) {
+            console.log('Game history recorded successfully');
+        }
+    })
+    .catch(error => {
+        console.error('Error recording game history:', error);
+    });
+}
+
+// Now modify your existing joinGame function
+function joinGame(gameId) {
+    if (gameId) {
+        // Record history before joining
+        recordGameHistory(gameId, 'public');
+        
+        window.location.href = `http://127.0.0.1:8000/public/${gameId}/${currentUsername}`;
+    }
+}
+
+// Update the join game form submission handler
+document.addEventListener("DOMContentLoaded", function() {
+    // Join Game Form handling
+    const joinGameForm = document.querySelector("#joinGameModal .modal-form");
+    if (joinGameForm) {
+        const originalHandler = joinGameForm.onsubmit;
+        
+        joinGameForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            const gameIdInput = joinGameForm.querySelector("input[type='text']");
+            const gameId = gameIdInput.value.trim();
+            
+            if (!gameId) {
+                alert("Please enter a valid game code");
+                return;
+            }
+            
+            // Record history before joining
+            recordGameHistory(gameId, 'private');
+            
+            // Continue with original navigation
+            joinGameModal.classList.remove('active');
+            window.location.href = `http://127.0.0.1:8000/private/${gameId}/${currentUsername}`;
+        });
+    }
+    
+    // Update create game form submission
+   
+            const apiUrl = `http://127.0.0.1:8000/new_game/${gameType}`;
+            
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(gameId => {
+                    console.log(`Game ID: ${gameId}`);
+                    alert(`Game Created! ID: ${gameId}`);
+                    createGameModal.classList.remove('active');
+                    
+                    // Record history before redirecting
+                    recordGameHistory(gameId, gameType);
+                    
+                    window.location.href = `http://127.0.0.1:8000/${gameType}/${gameId}/${currentUsername}`;
+                })
+                .catch(error => {
+                    console.error("Error creating game:", error);
+                    alert("Failed to create game. Please try again. Error: " + error.message);
+                });
+        });
 
     </script>
 </body>

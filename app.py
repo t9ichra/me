@@ -506,5 +506,66 @@ async def disconnect():
     response.delete_cookie(key="user_session")
     return response
 
+from datetime import datetime
+from pydantic import BaseModel
+
+
+class GameHistoryRecord(BaseModel):
+    username: str
+    gameId: str
+    gameType: str
+
+@app.post("/record_history")
+async def record_history(history_data: GameHistoryRecord, request: Request):
+    # Check authentication
+    redirect_response = require_auth(request)
+    if redirect_response:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    try:
+        # Get user session data to verify username
+        user_session = request.cookies.get("user_session")
+        session_data = json.loads(user_session)
+        session_username = session_data.get("username", "Unknown")
+        
+        # Verify username matches the session (security check)
+        if session_username != history_data.username:
+            raise HTTPException(status_code=403, detail="Username mismatch")
+        
+        # Get user ID from database
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        
+        # Query user ID from username
+        cursor.execute("SELECT id_user FROM user WHERE username = %s", (history_data.username,))
+        user_result = cursor.fetchone()
+        
+        if not user_result:
+            cursor.close()
+            connection.close()
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        user_id = user_result['id_user']
+        
+        # Get current timestamp
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Insert record into history table
+        cursor.execute(
+            "INSERT INTO history (id_user, joined_at, idLobby, type_Lobby) VALUES (%s, %s, %s, %s)",
+            (user_id, current_time, history_data.gameId, history_data.gameType)
+        )
+        
+        connection.commit()
+        cursor.close()
+        connection.close()
+        
+        return {"status": "success", "message": "History recorded successfully"}
+        
+    except Exception as e:
+        # Log the error
+        print(f"Error recording history: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to record history: {str(e)}")
+    
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8080)
