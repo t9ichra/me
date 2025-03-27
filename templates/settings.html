@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survival Game Controls</title>
+    <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: black;
+            color: white;
+            font-family: 'Darker Grotesque', sans-serif;
+            overflow: hidden;
+             overflow-y: auto;
+        }
+
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .header-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .interface-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .left-buttons, .right-buttons {
+            position: absolute;
+            display: none;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .left-buttons {
+            right: 100%;
+            margin-right: 20px;
+        }
+
+        .right-buttons {
+            left: 100%;
+            margin-left: 20px;
+        }
+
+        .left-buttons.visible,
+        .right-buttons.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        button {
+            background: linear-gradient(90deg, #ff0000, #550000);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            color: white;
+            cursor: pointer;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+            animation: fadeInScale 0.5s ease forwards;
+        }
+
+        button:hover {
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.9);
+        }
+
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding-top: 100px;
+            text-align: center;
+        }
+
+        .control-section {
+            background: rgba(30, 30, 30, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            max-width: 800px;
+            width: 90%;
+        }
+
+        .control-section h2 {
+            color: #ff0000;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        .key-list {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .key-item {
+            background: linear-gradient(90deg, #550000, #330000);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 5px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+        }
+
+        .key-item .key {
+            background: #ff0000;
+            color: white;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .warning {
+            color: #ff4444;
+            font-size: 1em;
+            margin-top: 20px;
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
+            max-width: 800px;
+            padding: 15px;
+            background: rgba(100, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .header {
+            width: 120px;
+            height: 80px;
+            border-radius: 60% 60% 50% 50%;
+            background: radial-gradient(circle, #610c0c, #550000);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease;
+        }
+
+        ::selection {
+            background-color: #660000;
+            color: #ffffff;
+            text-shadow: 0 0 8px #ff0000;
+        }
+
+
+        .header .eye {
+            position: relative;
+            width: 80px;
+            height: 60px;
+            background: #cbbb5f;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .eyelid {
+            position: absolute;
+            width: 100%;
+            height: 50%;
+            background: #550000;
+            left: 0;
+            z-index: 2;
+            animation: blink 4s infinite;
+        }
+
+        .eyelid.upper {
+            top: 0;
+            transform-origin: top;
+        }
+
+        .eyelid.lower {
+            bottom: 0;
+            transform-origin: bottom;
+        }
+
+        .header .pupil {
+            position: absolute;
+            width: 8px;
+            height: 35px;
+            background: black;
+            border-radius: 50%;
+            transition: transform 0.1s ease-out;
+            z-index: 1;
+        }
+
+        @keyframes blink {
+            0%, 95%, 100% {
+                transform: scaleY(0);
+            }
+            97.5% {
+                transform: scaleY(1);
+            }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <div class="header-container">
+        <div class="interface-container">
+            <div class="left-buttons">
+                <button><a href="/">Home</a></button>
+                <button><a href="/lore">The Lore</a></button>
+            </div>
+            <div class="header" onclick="toggleButtons()">
+                <div class="eye">
+                    <div class="eyelid upper"></div>
+                    <div class="eyelid lower"></div>
+                    <div class="pupil"></div>
+                </div>
+            </div>
+            <div class="right-buttons">
+                <button><a href="/lobby">Lobbies</a></button>
+                <button><a href="/manage">Manage Account</a></button>
+                <button><a href="/disconnect">Disconnect</a></button>
+            </div>
+        </div>
+    </div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+    <div class="controls-container">
+        <div class="control-section">
+            <h2>Game Objective</h2>
+            <p>Hunters: Kill and prevent survivors from escaping. Survivors: Collect keys and survive!</p>
+        </div>
+
+        <div class="control-section">
+            <h2>Survivor Controls</h2>
+            <div class="key-list">
+                <div class="key-item">
+                    <div class="key">W</div>
+                    <span>Move Forward</span>
+                </div>
+                <div class="key-item">
+                    <div class="key">Mouse</div>
+                    <span>Rotate/Look Around</span>
+                </div>
+                <div class="key-item">
+                    <div class="key">K</div>
+                    <span>Collect Keys</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-section">
+            <h2>Hunter Controls</h2>
+            <div class="key-list">
+                <div class="key-item">
+                    <div class="key">W</div>
+                    <span>Move Forward</span>
+                </div>
+                <div class="key-item">
+                    <div class="key">Mouse</div>
+                    <span>Rotate/Look Around</span>
+                </div>
+                <div class="key-item">
+                    <div class="key">K</div>
+                    <span>Kill Survivors</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-section">
+            <h2>Additional Controls</h2>
+            <div class="key-list">
+                <div class="key-item">
+                    <div class="key">ESC</div>
+                    <span>Free Cursor/Open Menu</span>
+                </div>
+                <div class="key-item">
+                    <div class="key">H</div>
+                    <span>Open Chat</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="warning">
+            <h3>IMPORTANT WARNINGS</h3>
+            <p>DO NOT REFRESH THE BROWSER – THIS WILL MAKE YOU LEAVE GAME!</p>
+            <p>CHAT RESPECTFULLY - DISRESPECTFUL BEHAVIOR WILL RESULT IN TEMPORARY OR PERMANENT BANNING!</p>
+            
+        </div>
+    </div>
+
+    <script>
+        function toggleButtons() {
+            const leftButtons = document.querySelector('.left-buttons');
+            const rightButtons = document.querySelector('.right-buttons');
+            
+            leftButtons.classList.toggle('visible');
+            rightButtons.classList.toggle('visible');
+            
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach((btn, index) => {
+                btn.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+
+        const particlesContainer = document.getElementById('particles-js');
+    
+        const createParticle = () => {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+    
+            const size = Math.random() * 5 + 2;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+    
+            particle.style.position = 'absolute';
+            particle.style.background = 'red';
+            particle.style.borderRadius = '50%';
+    
+            particle.style.left = `${Math.random() * 100}vw`;
+            particle.style.top = `${Math.random() * 100}vh`;
+            particle.style.opacity = Math.random();
+    
+            const animationDuration = Math.random() * 5 + 2;
+            particle.style.animation = `moveParticle ${animationDuration}s linear infinite`;
+    
+            particlesContainer.appendChild(particle);
+    
+            setTimeout(() => {
+                particle.remove();
+            }, animationDuration * 1000);
+        };
+    
+        setInterval(createParticle, 100);
+    
+        document.head.insertAdjacentHTML(
+            'beforeend',
+            `<style>
+                @keyframes moveParticle {
+                    0% { transform: translateY(0); opacity: 1; }
+                    100% { transform: translateY(-100vh); opacity: 0; }
+                }
+            </style>`
+        );
+    </script>
+</body>
+</html>

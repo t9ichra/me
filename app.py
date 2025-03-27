@@ -554,6 +554,11 @@ async def disconnect():
 from datetime import datetime
 from pydantic import BaseModel
 
+@app.get("/settings", response_class=HTMLResponse)
+async def settings(request: Request):
+    username = get_optional_user(request.cookies.get("user_session"))
+    return templates.TemplateResponse("settings.html", {"request": request, "username": username})
+
 
 class GameHistoryRecord(BaseModel):
     username: str
