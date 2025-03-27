@@ -230,6 +230,15 @@
                 transform: scale(1);
             }
         }
+        a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+        
+        a:hover {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -240,6 +249,7 @@
             <div class="left-buttons">
                 <button><a href="/">Home</a></button>
                 <button><a href="/lore">The Lore</a></button>
+                <button><a href="/lobby">Lobbies</a></button>
             </div>
             <div class="header" onclick="toggleButtons()">
                 <div class="eye">
@@ -249,7 +259,7 @@
                 </div>
             </div>
             <div class="right-buttons">
-                <button><a href="/lobby">Lobbies</a></button>
+                <button><a href="/settings">Settings</a></button>
                 <button><a href="/manage">Manage Account</a></button>
                 <button><a href="/disconnect">Disconnect</a></button>
             </div>
