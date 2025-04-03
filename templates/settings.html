@@ -385,5 +385,57 @@
             </style>`
         );
     </script>
+    <script>
+        const header = document.querySelector('.header');
+        const pupil = document.querySelector('.pupil');
+        const leftButtons = document.querySelector('.left-buttons');
+        const rightButtons = document.querySelector('.right-buttons');
+
+        function toggleButtons() {
+            leftButtons.classList.toggle('visible');
+            rightButtons.classList.toggle('visible');
+            
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach((btn, index) => {
+                btn.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+
+        document.addEventListener('mousemove', (event) => {
+            const rect = header.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const dx = event.clientX - centerX;
+            const dy = event.clientY - centerY;
+            const angle = Math.atan2(dy, dx);
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            const maxDistance = 15;
+            const ratio = Math.min(maxDistance / distance, 1);
+
+            const offsetX = dx * ratio * 0.3;
+            const offsetY = dy * ratio * 0.3;
+
+            pupil.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+        });
+
+        // Add random additional blinks
+        function addRandomBlink() {
+            const eyelids = document.querySelectorAll('.eyelid');
+            const randomDelay = Math.random() * 5000 + 2000; // Random delay between 2-7 seconds
+            
+            setTimeout(() => {
+                eyelids.forEach(eyelid => {
+                    eyelid.style.animation = 'none';
+                    eyelid.offsetHeight; // Trigger reflow
+                    eyelid.style.animation = 'blink 4s infinite';
+                });
+                addRandomBlink();
+            }, randomDelay);
+        }
+
+        addRandomBlink();
+    </script>
 </body>
 </html>
