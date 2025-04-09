@@ -381,7 +381,6 @@
             background-color: #8B0000;
             border: none;
             color: #fff;
-            font-size: 16px;
             letter-spacing: 2px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -541,19 +540,24 @@
     background: linear-gradient(90deg, #ff0000, #550000);
     border: none;
     border-radius: 10px;
-    padding: 10px 5px;
+    padding: 10px 20px; /* Adjust padding to match header.html */
     color: white;
     cursor: pointer;
     text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
     animation: cat-fadeInScale 0.5s ease forwards;
-    width: 120px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-decoration: none; /* Important for the a.button element */
-    font-size: 16px;
     font-family: 'Darker Grotesque', sans-serif;
+    width: auto; 
+    height: auto; 
+    display: inline-block;
+    line-height: normal; 
+    font-weight: normal; 
+    box-sizing: border-box; 
+}
+
+.cat-left-buttons button:hover, 
+.cat-right-buttons button:hover,
+.cat-right-buttons .button:hover {
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.9);
 }
 
 .cat-left-buttons button a, 
@@ -561,10 +565,13 @@
 .cat-right-buttons .button {
     color: white;
     text-decoration: none;
-    display: block;
-    width: 100%;
+    display: inline-block; /* Change to inline-block */
+    width: auto; /* Change from 100% to auto */
     text-align: center;
+    padding: 0; /* Remove any padding on links */
+    margin: 0; /* Remove any margin on links */
 }
+
 
 .cat-btn:hover {
     box-shadow: 0 0 20px rgba(255, 0, 0, 0.9);
@@ -1059,53 +1066,70 @@ document.getElementById('creepyForm').addEventListener('submit', function(e) {
     </script>
 
 <script>
-    function toggleCatButtons() {
-        const leftButtons = document.querySelector('.cat-left-buttons');
-        const rightButtons = document.querySelector('.cat-right-buttons');
-        leftButtons.classList.toggle('visible');
-        rightButtons.classList.toggle('visible');
-        
-        const buttons = document.querySelectorAll('.cat-btn');
-        buttons.forEach((btn, index) => {
-            btn.style.animationDelay = `${index * 0.1}s`;
-        });
-    }
+// Replace the toggleButtons function in manage.html
+function toggleCatButtons() {
+    const leftButtons = document.querySelector('.cat-left-buttons');
+    const rightButtons = document.querySelector('.cat-right-buttons');
+    leftButtons.classList.toggle('visible');
+    rightButtons.classList.toggle('visible');
     
-    document.addEventListener('mousemove', (event) => {
-        const header = document.querySelector('.cat-header');
-        const pupil = document.querySelector('.cat-pupil');
-        if (header && pupil) {
-            const rect = header.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            
-            const dx = event.clientX - centerX;
-            const dy = event.clientY - centerY;
-            
-            const maxDistance = 15;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const ratio = Math.min(maxDistance / distance, 1);
-    
-            const offsetX = dx * ratio * 0.3;
-            const offsetY = dy * ratio * 0.3;
-    
-            pupil.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-        }
+    const buttons = document.querySelectorAll('.cat-left-buttons button, .cat-right-buttons button, .cat-right-buttons .button');
+    buttons.forEach((btn, index) => {
+        btn.style.animationDelay = `${index * 0.1}s`;
     });
-    
-    function addCatRandomBlink() {
-        const eyelids = document.querySelectorAll('.cat-eyelid');
-        const randomDelay = Math.random() * 5000 + 2000; 
+}
+
+// Replace the mousemove event handler
+document.addEventListener('mousemove', (event) => {
+    const header = document.querySelector('.cat-header');
+    const pupil = document.querySelector('.cat-pupil');
+    if (header && pupil) {
+        const rect = header.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
         
-        setTimeout(() => {
-            eyelids.forEach(eyelid => {
-                eyelid.style.animation = 'none';
-                eyelid.offsetHeight; 
-                eyelid.style.animation = 'cat-blink 4s infinite';
-            });
-            addCatRandomBlink();
-        }, randomDelay);
+        const dx = event.clientX - centerX;
+        const dy = event.clientY - centerY;
+        
+        const maxDistance = 15;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const ratio = Math.min(maxDistance / distance, 1);
+
+        const offsetX = dx * ratio * 0.3;
+        const offsetY = dy * ratio * 0.3;
+
+        pupil.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
     }
+});
+
+// Replace the addRandomBlink function
+function addCatRandomBlink() {
+    const eyelids = document.querySelectorAll('.cat-eyelid');
+    const randomDelay = Math.random() * 5000 + 2000; 
+    
+    setTimeout(() => {
+        eyelids.forEach(eyelid => {
+            eyelid.style.animation = 'none';
+            eyelid.offsetHeight; 
+            eyelid.style.animation = 'cat-blink 4s infinite';
+        });
+        addCatRandomBlink();
+    }, randomDelay);
+}
+    
+function addCatRandomBlink() {
+    const eyelids = document.querySelectorAll('.cat-eyelid');
+    const randomDelay = Math.random() * 5000 + 2000; 
+    
+    setTimeout(() => {
+        eyelids.forEach(eyelid => {
+            eyelid.style.animation = 'none';
+            eyelid.offsetHeight; 
+            eyelid.style.animation = 'cat-blink 4s infinite';
+        });
+        addCatRandomBlink();
+    }, randomDelay);
+}
     
     
     const originalOnload = window.onload;
